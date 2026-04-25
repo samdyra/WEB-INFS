@@ -1,0 +1,73 @@
+{% extends "mockup/base.html" %}
+{% block title %}Edit Subscription — GeoMetaAssist{% endblock %}
+
+{% block nav_admin %}
+<div class="nav-divider"></div>
+<div class="section-label">Admin Portal</div>
+<a href="{% url 'admin_subscriptions' %}" class="nav-link active">
+  <i class="bi bi-people"></i> Subscriptions
+</a>
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'admin_subscriptions' %}" class="text-decoration-none">Admin Portal</a></li>
+<li class="breadcrumb-item"><a href="{% url 'admin_subscriptions' %}" class="text-decoration-none">Subscriptions</a></li>
+<li class="breadcrumb-item active">Edit — Jane Doe</li>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title mb-4">Edit Subscription</h1>
+
+<div style="max-width: 600px;">
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+      <div class="mb-3">
+        <label class="form-label fw-medium" style="font-size: 0.9rem;">User</label>
+        <div class="form-control bg-light" style="font-size: 0.9rem;">Jane Doe (jane.doe@example.com)</div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium" style="font-size: 0.9rem;">Plan</label>
+        <select class="form-select">
+          <option>Free</option>
+          <option selected>Pro</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium" style="font-size: 0.9rem;">Status</label>
+        <select class="form-select">
+          <option selected>Active</option>
+          <option>Archived</option>
+        </select>
+      </div>
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label fw-medium" style="font-size: 0.9rem;">Start Date</label>
+          <input type="date" class="form-control" value="2026-01-01">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-medium" style="font-size: 0.9rem;">End Date</label>
+          <input type="date" class="form-control" value="2026-12-31">
+        </div>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="{% url 'admin_subscriptions' %}" class="btn btn-gma">Save Changes</a>
+        <a href="{% url 'admin_subscriptions' %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Danger Zone -->
+  <div class="card border-danger">
+    <div class="card-body p-4">
+      <h6 class="fw-semibold text-danger mb-2">Danger Zone</h6>
+      <p class="text-muted mb-3" style="font-size: 0.875rem;">
+        Archiving this subscription will immediately revoke the user's access to Pro features.
+        This action can be reversed by setting the status back to Active.
+      </p>
+      <button class="btn btn-outline-danger btn-sm">
+        <i class="bi bi-archive me-1"></i>Archive Subscription
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}

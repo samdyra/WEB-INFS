@@ -1,0 +1,37 @@
+{% extends "mockup/base.html" %}
+{% block title %}Upload GeoJSON — GeoMetaAssist{% endblock %}
+{% block nav_projects %}active{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none">Projects</a></li>
+<li class="breadcrumb-item"><a href="{% url 'project_detail' %}" class="text-decoration-none">Brisbane Flood Extent 2023</a></li>
+<li class="breadcrumb-item active">Upload GeoJSON</li>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title mb-4">Upload GeoJSON</h1>
+
+<div class="card border-0 shadow-sm" style="max-width: 600px;">
+  <div class="card-body p-4">
+    <div class="border border-2 border-dashed rounded-3 text-center p-5 mb-3" style="border-color: var(--gma-border) !important; background: var(--gma-green-pale);">
+      <i class="bi bi-cloud-arrow-up" style="font-size: 2.5rem; color: var(--gma-green-mid);"></i>
+      <p class="fw-medium mt-2 mb-1">Drag and drop your GeoJSON file here</p>
+      <p class="text-muted mb-0" style="font-size: 0.9rem;">or use the file picker below</p>
+    </div>
+
+    <div class="mb-3">
+      <input type="file" class="form-control" accept=".geojson">
+    </div>
+
+    <p class="text-muted mb-4" style="font-size: 0.85rem;">
+      <i class="bi bi-info-circle me-1"></i>
+      Accepted format: .geojson only. Max file size: 50MB.
+    </p>
+
+    <div class="d-flex gap-2">
+      <a href="{% url 'project_detail' %}" class="btn btn-gma">Upload</a>
+      <a href="{% url 'project_detail' %}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "mockup/base_public.html" %}
+{% block title %}Create Account — GeoMetaAssist{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center px-3" style="min-height: calc(100vh - 60px); padding: 2rem 0;">
+  <div class="card shadow-sm border-0" style="max-width: 420px; width: 100%;">
+    <div class="card-body p-4">
+      <h4 class="fw-semibold text-center mb-1">Create your account</h4>
+      <p class="text-muted text-center mb-4" style="font-size: 0.9rem;">Start managing geospatial metadata with AI</p>
+
+      <form>
+        <div class="row g-2 mb-3">
+          <div class="col">
+            <label class="form-label" style="font-size: 0.9rem;">First name</label>
+            <input type="text" class="form-control" placeholder="Jane">
+          </div>
+          <div class="col">
+            <label class="form-label" style="font-size: 0.9rem;">Last name</label>
+            <input type="text" class="form-control" placeholder="Doe">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" style="font-size: 0.9rem;">Email address</label>
+          <input type="email" class="form-control" placeholder="you@example.com">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" style="font-size: 0.9rem;">Password</label>
+          <input type="password" class="form-control" placeholder="Create a password">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" style="font-size: 0.9rem;">Confirm password</label>
+          <input type="password" class="form-control" placeholder="Confirm your password">
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn btn-gma w-100 mb-3">Create account</a>
+      </form>
+
+      <div class="d-flex align-items-center my-3">
+        <hr class="flex-grow-1"><span class="mx-3 text-muted" style="font-size: 0.85rem;">or continue with</span><hr class="flex-grow-1">
+      </div>
+
+      <div class="d-grid gap-2">
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+          <i class="bi bi-google me-2"></i>Google
+        </a>
+        <a href="{% url 'dashboard' %}" class="btn btn-dark">
+          <i class="bi bi-github me-2"></i>GitHub
+        </a>
+      </div>
+
+      <p class="text-center mt-3 mb-0" style="font-size: 0.9rem;">
+        Already have an account? <a href="{% url 'login' %}" style="color: var(--gma-green-mid);">Sign in</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

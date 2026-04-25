@@ -1,0 +1,98 @@
+{% extends "mockup/base.html" %}
+{% block title %}Upload Detail — GeoMetaAssist{% endblock %}
+{% block nav_projects %}active{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none">Projects</a></li>
+<li class="breadcrumb-item"><a href="{% url 'project_detail' %}" class="text-decoration-none">Brisbane Flood Extent 2023</a></li>
+<li class="breadcrumb-item active">brisbane_flood_polygons.geojson</li>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title mb-1">brisbane_flood_polygons.geojson</h1>
+<p class="text-muted mb-4" style="font-size: 0.9rem;">Uploaded 25 Mar 2026 &middot; Status: <span class="badge bg-success">Complete</span></p>
+
+<div class="row g-4">
+  <!-- Left: Technical Metadata -->
+  <div class="col-12 col-lg-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header card-header-pale border-0">
+        <h6 class="fw-semibold mb-0"><i class="bi bi-cpu me-2"></i>Extracted Technical Metadata</h6>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-borderless mb-0">
+          <tbody>
+            <tr>
+              <td class="text-muted fw-medium ps-4" style="width: 40%; font-size: 0.875rem;">CRS / EPSG</td>
+              <td style="font-size: 0.875rem;">EPSG:4326</td>
+            </tr>
+            <tr class="bg-light">
+              <td class="text-muted fw-medium ps-4" style="font-size: 0.875rem;">Bounding Box</td>
+              <td style="font-size: 0.875rem;">152.68, -27.85, 153.55, -27.10</td>
+            </tr>
+            <tr>
+              <td class="text-muted fw-medium ps-4" style="font-size: 0.875rem;">Geometry Type</td>
+              <td style="font-size: 0.875rem;">Polygon</td>
+            </tr>
+            <tr class="bg-light">
+              <td class="text-muted fw-medium ps-4" style="font-size: 0.875rem;">Feature Count</td>
+              <td style="font-size: 0.875rem;">2,847</td>
+            </tr>
+            <tr>
+              <td class="text-muted fw-medium ps-4" style="font-size: 0.875rem;">Attribute Schema</td>
+              <td style="font-size: 0.875rem;">
+                <code>flood_depth_m</code> <span class="text-muted">(float)</span><br>
+                <code>suburb_name</code> <span class="text-muted">(string)</span><br>
+                <code>risk_level</code> <span class="text-muted">(string)</span><br>
+                <code>area_ha</code> <span class="text-muted">(float)</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: AI Status -->
+  <div class="col-12 col-lg-5">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header card-header-pale border-0">
+        <h6 class="fw-semibold mb-0"><i class="bi bi-stars me-2"></i>AI Status</h6>
+      </div>
+      <div class="card-body">
+        <div class="d-flex align-items-start gap-3 mb-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: var(--gma-green-light);">
+            <i class="bi bi-check-lg" style="color: var(--gma-green-dark);"></i>
+          </div>
+          <div>
+            <div class="fw-medium" style="font-size: 0.9rem;">Step 1: Technical Extraction</div>
+            <small class="text-muted">CRS, bounding box, schema extracted successfully</small>
+          </div>
+        </div>
+        <div class="d-flex align-items-start gap-3 mb-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: var(--gma-green-light);">
+            <i class="bi bi-check-lg" style="color: var(--gma-green-dark);"></i>
+          </div>
+          <div>
+            <div class="fw-medium" style="font-size: 0.9rem;">Step 2: AI Suggestions Generated</div>
+            <small class="text-muted">Title, description, keywords, and license suggested</small>
+          </div>
+        </div>
+        <div class="d-flex align-items-start gap-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: #fff3cd;">
+            <i class="bi bi-hourglass-split" style="color: #856404;"></i>
+          </div>
+          <div>
+            <div class="fw-medium" style="font-size: 0.9rem;">Step 3: Your Review</div>
+            <small class="text-muted">Review and edit the AI-suggested metadata</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <a href="{% url 'metadata_editor' %}" class="btn btn-gma w-100 mt-3">
+      <i class="bi bi-pencil-square me-1"></i>Review and Edit Metadata
+    </a>
+  </div>
+</div>
+{% endblock %}

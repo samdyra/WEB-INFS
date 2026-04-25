@@ -1,0 +1,144 @@
+{% extends "mockup/base.html" %}
+{% block title %}Subscription Management — GeoMetaAssist{% endblock %}
+
+{% block nav_admin %}
+<div class="nav-divider"></div>
+<div class="section-label">Admin Portal</div>
+<a href="{% url 'admin_subscriptions' %}" class="nav-link active">
+  <i class="bi bi-people"></i> Subscriptions
+</a>
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">Admin Portal</li>
+<li class="breadcrumb-item active">Subscriptions</li>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title mb-4">Subscription Management</h1>
+
+<!-- Filter Bar -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body py-3">
+    <div class="row g-3 align-items-end">
+      <div class="col-12 col-md-5">
+        <input type="text" class="form-control" placeholder="Search by user or email...">
+      </div>
+      <div class="col-8 col-md-3">
+        <select class="form-select">
+          <option selected>All Statuses</option>
+          <option>Active</option>
+          <option>Archived</option>
+        </select>
+      </div>
+      <div class="col-4 col-md-2">
+        <button class="btn btn-gma w-100">Filter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card border-0 shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th style="font-size: 0.85rem;">User</th>
+          <th style="font-size: 0.85rem;">Email</th>
+          <th style="font-size: 0.85rem;">Plan</th>
+          <th style="font-size: 0.85rem;">Status</th>
+          <th style="font-size: 0.85rem;">Start Date</th>
+          <th style="font-size: 0.85rem;">End Date</th>
+          <th style="font-size: 0.85rem;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Jane Doe</td>
+          <td class="text-muted">jane.doe@example.com</td>
+          <td><span class="badge badge-gma">Pro</span></td>
+          <td><span class="badge bg-success">Active</span></td>
+          <td class="text-muted">1 Jan 2026</td>
+          <td class="text-muted">31 Dec 2026</td>
+          <td>
+            <a href="{% url 'admin_subscription_edit' %}" class="btn btn-sm btn-outline-secondary me-1">Edit</a>
+            <button class="btn btn-sm btn-outline-danger">Archive</button>
+          </td>
+        </tr>
+        <tr>
+          <td>Tom Nguyen</td>
+          <td class="text-muted">t.nguyen@spatial.io</td>
+          <td><span class="badge badge-gma">Pro</span></td>
+          <td><span class="badge bg-success">Active</span></td>
+          <td class="text-muted">15 Feb 2026</td>
+          <td class="text-muted">14 Feb 2027</td>
+          <td>
+            <a href="{% url 'admin_subscription_edit' %}" class="btn btn-sm btn-outline-secondary me-1">Edit</a>
+            <button class="btn btn-sm btn-outline-danger">Archive</button>
+          </td>
+        </tr>
+        <tr>
+          <td>Sarah Mitchell</td>
+          <td class="text-muted">sarah.m@geodata.com.au</td>
+          <td><span class="badge bg-secondary">Free</span></td>
+          <td><span class="badge bg-success">Active</span></td>
+          <td class="text-muted">10 Mar 2026</td>
+          <td class="text-muted">—</td>
+          <td>
+            <a href="{% url 'admin_subscription_edit' %}" class="btn btn-sm btn-outline-secondary me-1">Edit</a>
+            <button class="btn btn-sm btn-outline-danger">Archive</button>
+          </td>
+        </tr>
+        <tr>
+          <td>Raj Patel</td>
+          <td class="text-muted">raj@enviro-analytics.co</td>
+          <td><span class="badge badge-gma">Pro</span></td>
+          <td><span class="badge bg-success">Active</span></td>
+          <td class="text-muted">5 Nov 2025</td>
+          <td class="text-muted">4 Nov 2026</td>
+          <td>
+            <a href="{% url 'admin_subscription_edit' %}" class="btn btn-sm btn-outline-secondary me-1">Edit</a>
+            <button class="btn btn-sm btn-outline-danger">Archive</button>
+          </td>
+        </tr>
+        <tr>
+          <td>Lisa Chen</td>
+          <td class="text-muted">l.chen@unimelb.edu.au</td>
+          <td><span class="badge bg-secondary">Free</span></td>
+          <td><span class="badge bg-secondary">Archived</span></td>
+          <td class="text-muted">20 Jun 2025</td>
+          <td class="text-muted">19 Jun 2026</td>
+          <td>
+            <a href="{% url 'admin_subscription_edit' %}" class="btn btn-sm btn-outline-secondary me-1">Edit</a>
+            <button class="btn btn-sm btn-outline-danger">Archive</button>
+          </td>
+        </tr>
+        <tr>
+          <td>Mark Thompson</td>
+          <td class="text-muted">mark.t@waternsw.gov.au</td>
+          <td><span class="badge badge-gma">Pro</span></td>
+          <td><span class="badge bg-secondary">Archived</span></td>
+          <td class="text-muted">1 Apr 2025</td>
+          <td class="text-muted">31 Mar 2026</td>
+          <td>
+            <a href="{% url 'admin_subscription_edit' %}" class="btn btn-sm btn-outline-secondary me-1">Edit</a>
+            <button class="btn btn-sm btn-outline-danger">Archive</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Pagination -->
+<nav class="mt-4 d-flex justify-content-center">
+  <ul class="pagination pagination-sm">
+    <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+    <li class="page-item active" style="--bs-pagination-active-bg: var(--gma-green-mid); --bs-pagination-active-border-color: var(--gma-green-mid);"><a class="page-link" href="#">1</a></li>
+    <li class="page-item"><a class="page-link" href="#">2</a></li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+  </ul>
+</nav>
+{% endblock %}
