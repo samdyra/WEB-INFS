@@ -4,7 +4,6 @@ How to run this Project:
 1. Create and activate a virtual environment
 python -m venv venv
 source venv/bin/activate        # macOS / Linux
-venv\Scripts\activate           # Windows
 
 2. Install dependencies
 pip install -r requirements.txt
