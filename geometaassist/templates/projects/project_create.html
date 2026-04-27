@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Create Project — GeoMetaAssist{% endblock %}
+{% block nav_projects %}active{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none">Projects</a></li>
+<li class="breadcrumb-item active">New Project</li>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title mb-4">Create New Project</h1>
+
+<div class="card border-0 shadow-sm" style="max-width: 640px;">
+  <div class="card-body p-4">
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger py-2" style="font-size: 0.85rem;">
+          {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="mb-3">
+        <label for="{{ form.name.id_for_label }}" class="form-label fw-medium">{{ form.name.label }}</label>
+        {{ form.name }}
+        {% if form.name.errors %}
+          <div class="text-danger mt-1" style="font-size: 0.85rem;">
+            {% for error in form.name.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="mb-4">
+        <label for="{{ form.description.id_for_label }}" class="form-label fw-medium">{{ form.description.label }}</label>
+        {{ form.description }}
+        {% if form.description.errors %}
+          <div class="text-danger mt-1" style="font-size: 0.85rem;">
+            {% for error in form.description.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-gma">Save</button>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

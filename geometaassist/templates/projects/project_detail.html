@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ project.name }} — GeoMetaAssist{% endblock %}
+{% block nav_projects %}active{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none">Projects</a></li>
+<li class="breadcrumb-item active">{{ project.name }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-2 mb-2">
+  <div>
+    <h1 class="page-title mb-1">{{ project.name }}</h1>
+    <p class="text-muted mb-1" style="font-size: 0.9rem;">
+      {{ project.description|default:"No description." }}
+    </p>
+    <small class="text-muted">Created {{ project.created_at|date:"d M Y" }}</small>
+  </div>
+  <a href="{% url 'project_edit' project.pk %}" class="btn btn-outline-secondary btn-sm flex-shrink-0">
+    <i class="bi bi-pencil me-1"></i>Edit
+  </a>
+</div>
+
+<hr class="my-4">
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <p class="section-label mb-0">GeoJSON Uploads</p>
+  <a href="#" class="btn btn-gma btn-sm"><i class="bi bi-cloud-upload me-1"></i>Upload GeoJSON</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th style="font-size: 0.85rem;">Filename</th>
+          <th style="font-size: 0.85rem;">Uploaded</th>
+          <th style="font-size: 0.85rem;">Status</th>
+          <th style="font-size: 0.85rem;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="4" class="text-center text-muted py-4" style="font-size: 0.9rem;">
+            No uploads yet
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
