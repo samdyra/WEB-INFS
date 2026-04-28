@@ -57,6 +57,86 @@ class RegisterForm(forms.ModelForm):
         return user
 
 
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name')
+        widgets = {
+            'first_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Jane',
+            }),
+            'last_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Doe',
+            }),
+        }
+        labels = {
+            'first_name': 'First name',
+            'last_name': 'Last name',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['first_name'].required = True
+        self.fields['last_name'].required = True
+
+
+class PasswordChangeForm(forms.Form):
+    current_password = forms.CharField(
+        label='Current password',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your current password',
+        }),
+        strip=False,
+    )
+    new_password = forms.CharField(
+        label='New password',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Choose a new password',
+        }),
+        strip=False,
+    )
+    confirm_new_password = forms.CharField(
+        label='Confirm new password',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Re-enter the new password',
+        }),
+        strip=False,
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_current_password(self):
+        current = self.cleaned_data['current_password']
+        if not self.user.check_password(current):
+            raise forms.ValidationError('Current password is incorrect.')
+        return current
+
+    def clean(self):
+        cleaned = super().clean()
+        new = cleaned.get('new_password')
+        confirm = cleaned.get('confirm_new_password')
+        if new and confirm and new != confirm:
+            self.add_error('confirm_new_password', 'New passwords do not match.')
+        if new:
+            try:
+                password_validation.validate_password(new, self.user)
+            except forms.ValidationError as e:
+                self.add_error('new_password', e)
+        return cleaned
+
+    def save(self):
+        self.user.set_password(self.cleaned_data['new_password'])
+        self.user.save()
+        return self.user
+
+
 class LoginForm(forms.Form):
     email = forms.EmailField(
         label='Email address',
