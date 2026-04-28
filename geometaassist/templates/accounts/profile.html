@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Settings — GeoMetaAssist{% endblock %}
+{% block nav_settings %}active{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Settings</li>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title mb-4">Settings</h1>
+
+<div class="card border-0 shadow-sm mb-4" style="max-width: 720px;">
+  <div class="card-body p-4">
+    <h6 class="fw-semibold mb-1">Personal Information</h6>
+    <p class="text-muted mb-4" style="font-size: 0.875rem;">Update your name. Your email is used to sign in and cannot be changed here.</p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="action" value="update_profile">
+
+      {% if profile_form.non_field_errors %}
+        <div class="alert alert-danger py-2" style="font-size: 0.85rem;">
+          {% for error in profile_form.non_field_errors %}{{ error }}{% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="row g-3 mb-3">
+        <div class="col-12 col-md-6">
+          <label for="{{ profile_form.first_name.id_for_label }}" class="form-label fw-medium">{{ profile_form.first_name.label }}</label>
+          {{ profile_form.first_name }}
+          {% if profile_form.first_name.errors %}
+            <div class="text-danger mt-1" style="font-size: 0.85rem;">
+              {% for error in profile_form.first_name.errors %}{{ error }}{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+        <div class="col-12 col-md-6">
+          <label for="{{ profile_form.last_name.id_for_label }}" class="form-label fw-medium">{{ profile_form.last_name.label }}</label>
+          {{ profile_form.last_name }}
+          {% if profile_form.last_name.errors %}
+            <div class="text-danger mt-1" style="font-size: 0.85rem;">
+              {% for error in profile_form.last_name.errors %}{{ error }}{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label fw-medium">Email address</label>
+        <input type="email" class="form-control bg-light" value="{{ user.email }}" disabled>
+      </div>
+
+      <button type="submit" class="btn btn-gma">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm" style="max-width: 720px;">
+  <div class="card-body p-4">
+    <h6 class="fw-semibold mb-1">Change Password</h6>
+    <p class="text-muted mb-4" style="font-size: 0.875rem;">Choose a strong password you don't use anywhere else.</p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="action" value="change_password">
+
+      {% if password_form.non_field_errors %}
+        <div class="alert alert-danger py-2" style="font-size: 0.85rem;">
+          {% for error in password_form.non_field_errors %}{{ error }}{% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="mb-3">
+        <label for="{{ password_form.current_password.id_for_label }}" class="form-label fw-medium">{{ password_form.current_password.label }}</label>
+        {{ password_form.current_password }}
+        {% if password_form.current_password.errors %}
+          <div class="text-danger mt-1" style="font-size: 0.85rem;">
+            {% for error in password_form.current_password.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="mb-3">
+        <label for="{{ password_form.new_password.id_for_label }}" class="form-label fw-medium">{{ password_form.new_password.label }}</label>
+        {{ password_form.new_password }}
+        {% if password_form.new_password.errors %}
+          <div class="text-danger mt-1" style="font-size: 0.85rem;">
+            {% for error in password_form.new_password.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="mb-4">
+        <label for="{{ password_form.confirm_new_password.id_for_label }}" class="form-label fw-medium">{{ password_form.confirm_new_password.label }}</label>
+        {{ password_form.confirm_new_password }}
+        {% if password_form.confirm_new_password.errors %}
+          <div class="text-danger mt-1" style="font-size: 0.85rem;">
+            {% for error in password_form.confirm_new_password.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="btn btn-gma">Update Password</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
