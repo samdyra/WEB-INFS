@@ -10,7 +10,10 @@
 {% block content %}
 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-2 mb-2">
   <div>
-    <h1 class="page-title mb-1">{{ project.name }}</h1>
+    <h1 class="page-title mb-1">
+      {{ project.name }}
+      <span class="badge badge-gma ms-2 align-middle">{{ upload_count }} upload{{ upload_count|pluralize }}</span>
+    </h1>
     <p class="text-muted mb-1" style="font-size: 0.9rem;">
       {{ project.description|default:"No description." }}
     </p>
@@ -25,7 +28,9 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
   <p class="section-label mb-0">GeoJSON Uploads</p>
-  <a href="#" class="btn btn-gma btn-sm"><i class="bi bi-cloud-upload me-1"></i>Upload GeoJSON</a>
+  <a href="{% url 'upload_geojson' project.pk %}" class="btn btn-gma btn-sm">
+    <i class="bi bi-cloud-upload me-1"></i>Upload GeoJSON
+  </a>
 </div>
 
 <div class="card border-0 shadow-sm">
@@ -40,13 +45,55 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td colspan="4" class="text-center text-muted py-4" style="font-size: 0.9rem;">
-            No uploads yet
-          </td>
-        </tr>
+        {% for upload in uploads %}
+          <tr>
+            <td style="font-size: 0.875rem;">
+              <i class="bi bi-file-earmark-code me-2 text-muted"></i>{{ upload.original_filename }}
+            </td>
+            <td class="text-muted" style="font-size: 0.875rem;">{{ upload.uploaded_at|date:"d M Y" }}</td>
+            <td>
+              <span class="badge {{ upload.status_badge_class }}">{{ upload.get_upload_status_display }}</span>
+            </td>
+            <td>
+              <a href="{% url 'upload_detail' project.pk upload.pk %}" class="btn btn-sm btn-outline-secondary me-1">View</a>
+              <button type="button" class="btn btn-sm btn-outline-danger"
+                      data-bs-toggle="modal" data-bs-target="#deleteUploadModal{{ upload.pk }}">
+                Delete
+              </button>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4" class="text-center text-muted py-4" style="font-size: 0.9rem;">
+              No uploads yet
+            </td>
+          </tr>
+        {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
+
+{% for upload in uploads %}
+  <div class="modal fade" id="deleteUploadModal{{ upload.pk }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h6 class="modal-title fw-semibold">Delete upload?</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="font-size: 0.9rem;">
+          Are you sure you want to delete <strong>{{ upload.original_filename }}</strong>?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <form method="post" action="{% url 'upload_delete' project.pk upload.pk %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm">Delete upload</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endfor %}
 {% endblock %}

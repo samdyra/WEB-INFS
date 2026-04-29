@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Upload GeoJSON — {{ project.name }}{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none">Projects</a></li>
+<li class="breadcrumb-item"><a href="{% url 'project_detail' project.pk %}" class="text-decoration-none">{{ project.name }}</a></li>
+<li class="breadcrumb-item active">Upload GeoJSON</li>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title mb-4">Upload GeoJSON</h1>
+
+<div class="card border-0 shadow-sm" style="max-width: 600px;">
+  <div class="card-body p-4">
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger py-2" style="font-size: 0.85rem;">
+          {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="mb-3">
+        <label for="{{ form.file.id_for_label }}" class="form-label fw-medium">GeoJSON file</label>
+        {{ form.file }}
+        {% if form.file.errors %}
+          <div class="text-danger mt-1" style="font-size: 0.85rem;">
+            {% for error in form.file.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <p class="text-muted mb-4" style="font-size: 0.85rem;">
+        <i class="bi bi-info-circle me-1"></i>
+        Accepted formats: .geojson, .json &mdash; Maximum file size: 50MB
+      </p>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-gma">Upload</button>
+        <a href="{% url 'project_detail' project.pk %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
