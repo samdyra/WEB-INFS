@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Edit Subscription — Staff Portal{% endblock %}
+{% block nav_staff_subs %}active{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">Staff Portal</li>
+<li class="breadcrumb-item"><a href="{% url 'staff_subscriptions' %}" class="text-decoration-none">Subscriptions</a></li>
+<li class="breadcrumb-item active">Edit</li>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title mb-4">Edit Subscription</h1>
+
+<div style="max-width: 600px;">
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+      <h6 class="fw-semibold mb-3">User Information</h6>
+      <table class="table table-sm mb-0" style="font-size: 0.9rem;">
+        <tbody>
+          <tr>
+            <td class="text-muted" style="width: 35%;">Name</td>
+            <td>{{ subscription.user.full_name|default:"—" }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Email</td>
+            <td>{{ subscription.user.email }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Joined</td>
+            <td>{{ subscription.user.date_joined|date:"d M Y" }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger py-2" style="font-size: 0.85rem;">
+            {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label for="{{ form.plan.id_for_label }}" class="form-label fw-medium" style="font-size: 0.9rem;">Plan</label>
+          {{ form.plan }}
+          {% if form.plan.errors %}
+            <div class="text-danger mt-1" style="font-size: 0.85rem;">
+              {% for error in form.plan.errors %}{{ error }}{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="mb-4">
+          <label for="{{ form.status.id_for_label }}" class="form-label fw-medium" style="font-size: 0.9rem;">Status</label>
+          {{ form.status }}
+          {% if form.status.errors %}
+            <div class="text-danger mt-1" style="font-size: 0.85rem;">
+              {% for error in form.status.errors %}{{ error }}{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-gma">Save Changes</button>
+          <a href="{% url 'staff_subscriptions' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card border-danger">
+    <div class="card-body p-4">
+      <h6 class="fw-semibold text-danger mb-2">Danger Zone</h6>
+      {% if subscription.status == 'archived' %}
+        <p class="text-muted mb-3" style="font-size: 0.875rem;">
+          This subscription is archived
+          {% if subscription.archived_at %}(archived {{ subscription.archived_at|date:"d M Y" }}{% if subscription.archived_by %} by {{ subscription.archived_by.email }}{% endif %}){% endif %}.
+          Reactivating restores the user's access.
+        </p>
+        <form method="post" class="d-inline">
+          {% csrf_token %}
+          <input type="hidden" name="plan" value="{{ subscription.plan.pk }}">
+          <input type="hidden" name="status" value="active">
+          <button type="submit" class="btn btn-outline-success btn-sm">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>Reactivate Subscription
+          </button>
+        </form>
+      {% else %}
+        <p class="text-muted mb-3" style="font-size: 0.875rem;">
+          Archiving this subscription will immediately revoke the user's access to Pro features.
+          This action can be reversed by reactivating.
+        </p>
+        <form method="post" class="d-inline">
+          {% csrf_token %}
+          <input type="hidden" name="plan" value="{{ subscription.plan.pk }}">
+          <input type="hidden" name="status" value="archived">
+          <button type="submit" class="btn btn-outline-danger btn-sm">
+            <i class="bi bi-archive me-1"></i>Archive Subscription
+          </button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
