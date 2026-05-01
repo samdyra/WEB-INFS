@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods, require_POST
 
+from billing.models import SubscriptionPlan, UserSubscription
+
 from .forms import LoginForm, PasswordChangeForm, ProfileForm, RegisterForm
 
 
@@ -21,6 +23,8 @@ def register_view(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
+            free_plan = SubscriptionPlan.objects.get(name='Free')
+            UserSubscription.objects.create(user=user, plan=free_plan)
             login(request, user)
             return redirect('dashboard')
     else:
