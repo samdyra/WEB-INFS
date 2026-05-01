@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Limit Reached — GeoMetaAssist{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Limit Reached</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center">
+  <div class="card border-0 shadow-sm" style="max-width: 600px; width: 100%;">
+    <div class="card-body p-4 p-md-5 text-center">
+      <i class="bi bi-exclamation-triangle d-block mb-3" style="font-size: 2.5rem; color: #b8860b;"></i>
+      <h4 class="fw-semibold mb-2">You have reached your {{ subscription.plan.name|default:"Free" }} plan limit</h4>
+      <p class="text-muted mb-4" style="font-size: 0.95rem;">
+        {% if quota_type == 'project' %}
+          You can't create more projects on the {{ subscription.plan.name|default:"Free" }} plan
+          {% if subscription %}(maximum {{ subscription.plan.max_projects }}){% endif %}.
+        {% else %}
+          You can't add more uploads to this project on the {{ subscription.plan.name|default:"Free" }} plan
+          {% if subscription %}(maximum {{ subscription.plan.max_uploads_per_project }} per project){% endif %}.
+        {% endif %}
+        Upgrade to Pro for unlimited projects and uploads.
+      </p>
+
+      <table class="table table-sm border mb-4 text-start" style="font-size: 0.875rem;">
+        <thead class="table-light">
+          <tr>
+            <th>Feature</th>
+            <th>{{ subscription.plan.name|default:"Free" }}</th>
+            <th>Pro</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Projects</td>
+            <td>{{ subscription.plan.max_projects|default:"—" }}</td>
+            <td>Unlimited</td>
+          </tr>
+          <tr>
+            <td>Uploads per project</td>
+            <td>{{ subscription.plan.max_uploads_per_project|default:"—" }}</td>
+            <td>Unlimited</td>
+          </tr>
+          <tr>
+            <td>AI calls per month</td>
+            <td>{{ subscription.plan.max_ai_calls_per_month|default:"—" }}</td>
+            <td>Unlimited</td>
+          </tr>
+          <tr>
+            <td>Price</td>
+            <td>${{ subscription.plan.price_aud|default:"0" }} / month</td>
+            <td>${{ pro_plan.price_aud|default:"29" }} / month</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="d-flex gap-2 justify-content-center">
+        <button type="button" class="btn btn-gma px-4" id="upgradeBtn">
+          <i class="bi bi-stars me-1"></i>Upgrade to Pro
+        </button>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary px-4">Back to dashboard</a>
+      </div>
+
+      <div style="display: none;">{% csrf_token %}</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="upgradedModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h6 class="modal-title fw-semibold"><i class="bi bi-check-circle text-success me-2"></i>Successfully Upgraded</h6>
+      </div>
+      <div class="modal-body" style="font-size: 0.95rem;">
+        Your account has been upgraded to Pro. You now have unlimited projects and uploads.
+      </div>
+      <div class="modal-footer border-0">
+        <a href="{% url 'dashboard' %}" class="btn btn-gma">Continue</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function() {
+    var btn = document.getElementById('upgradeBtn');
+    var token = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+    btn.addEventListener('click', function() {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Upgrading...';
+      fetch('{% url "upgrade_to_pro" %}', {
+        method: 'POST',
+        headers: {'X-CSRFToken': token, 'Accept': 'application/json'},
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data && data.success) {
+          var modal = new bootstrap.Modal(document.getElementById('upgradedModal'));
+          modal.show();
+        } else {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="bi bi-stars me-1"></i>Upgrade to Pro';
+          alert('Upgrade failed. Please try again.');
+        }
+      })
+      .catch(function() {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-stars me-1"></i>Upgrade to Pro';
+        alert('Upgrade failed. Please try again.');
+      });
+    });
+  })();
+</script>
+{% endblock %}
