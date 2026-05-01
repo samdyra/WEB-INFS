@@ -28,12 +28,25 @@
     <a href="{% url 'profile' %}" class="nav-link {% block nav_settings %}{% endblock %}">
       <i class="bi bi-gear"></i> Settings
     </a>
-    {% block nav_admin %}{% endblock %}
+    {% if user.is_staff %}
+      <div class="nav-divider"></div>
+      <div class="section-label">Staff Portal</div>
+      <a href="{% url 'staff_subscriptions' %}" class="nav-link {% block nav_staff_subs %}{% endblock %}">
+        <i class="bi bi-people"></i> Subscriptions
+      </a>
+    {% endif %}
   </div>
   <div class="user-section">
     <div class="user-avatar">{{ user.initials|default:"?" }}</div>
     <div class="user-info">
-      <div class="name">{{ user.full_name|default:user.email }}</div>
+      <div class="d-flex align-items-center gap-2">
+        <div class="name">{{ user.full_name|default:user.email }}</div>
+        {% with sub=user.subscription %}
+          {% if sub %}
+            <span class="badge badge-gma" style="font-size: 0.7rem;">{{ sub.plan.name }}</span>
+          {% endif %}
+        {% endwith %}
+      </div>
       <form method="post" action="{% url 'logout' %}" class="d-inline">
         {% csrf_token %}
         <button type="submit">Sign out</button>

@@ -1,7 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
+
+from billing.quota import can_create_project, can_upload_file
 
 from .forms import GeoDataProjectForm, GeoJSONUploadForm
 from .models import GeoDataProject, GeoJSONUpload
@@ -26,6 +29,9 @@ def dashboard(request):
 
 @login_required
 def project_create(request):
+    allowed, _ = can_create_project(request.user)
+    if not allowed:
+        return redirect(f"{reverse('quota_exceeded')}?type=project")
     if request.method == 'POST':
         form = GeoDataProjectForm(request.POST)
         if form.is_valid():
@@ -86,6 +92,9 @@ def upload_geojson(request, project_pk):
     project = get_object_or_404(
         GeoDataProject, pk=project_pk, user=request.user, is_deleted=False
     )
+    allowed, _ = can_upload_file(request.user, project)
+    if not allowed:
+        return redirect(f"{reverse('quota_exceeded')}?type=upload")
     if request.method == 'POST':
         form = GeoJSONUploadForm(request.POST, request.FILES)
         if form.is_valid():
