@@ -12,6 +12,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('dashboard/', project_views.dashboard, name='dashboard'),
     path('projects/', include('projects.urls')),
+    path('', include('billing.urls')),
 ]
 
 if settings.DEBUG:
