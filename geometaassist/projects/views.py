@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from billing.quota import can_create_project, can_upload_file
+from metadata.extractor import extract_metadata
 
 from .forms import GeoDataProjectForm, GeoJSONUploadForm
 from .models import GeoDataProject, GeoJSONUpload
@@ -99,14 +100,18 @@ def upload_geojson(request, project_pk):
         form = GeoJSONUploadForm(request.POST, request.FILES)
         if form.is_valid():
             f = form.cleaned_data['file']
-            GeoJSONUpload.objects.create(
+            upload = GeoJSONUpload.objects.create(
                 project=project,
                 original_filename=f.name,
                 file=f,
                 file_size_bytes=f.size,
                 upload_status=GeoJSONUpload.UploadStatus.PENDING,
             )
-            return redirect('project_detail', pk=project.pk)
+            try:
+                extract_metadata(upload)
+            except Exception:
+                pass  # Error is recorded on the upload; user sees it on detail page.
+            return redirect('upload_detail', project_pk=project.pk, upload_pk=upload.pk)
     else:
         form = GeoJSONUploadForm()
     return render(request, 'projects/upload_geojson.html', {

@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Metadata Editor — {{ upload.original_filename }}{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none">Projects</a></li>
+<li class="breadcrumb-item"><a href="{% url 'project_detail' project.pk %}" class="text-decoration-none">{{ project.name }}</a></li>
+<li class="breadcrumb-item"><a href="{% url 'upload_detail' project.pk upload.pk %}" class="text-decoration-none">{{ upload.original_filename }}</a></li>
+<li class="breadcrumb-item active">Metadata Editor</li>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title mb-4">Metadata Editor</h1>
+
+<div class="row g-4">
+  <div class="col-12 col-lg-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header card-header-pale border-0">
+        <h6 class="fw-semibold mb-0">STAC Metadata Fields</h6>
+      </div>
+      <div class="card-body">
+        <form method="post" novalidate id="metadataForm">
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger py-2" style="font-size: 0.85rem;">
+              {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+            </div>
+          {% endif %}
+
+          <p class="section-label">Identification</p>
+          <div class="mb-3">
+            <label for="{{ form.stac_item_id.id_for_label }}" class="form-label fw-medium" style="font-size: 0.9rem;">STAC Item ID</label>
+            {{ form.stac_item_id }}
+            {% for error in form.stac_item_id.errors %}<div class="text-danger mt-1" style="font-size: 0.85rem;">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            <label for="{{ form.title.id_for_label }}" class="form-label fw-medium" style="font-size: 0.9rem;">Title</label>
+            {{ form.title }}
+            {% for error in form.title.errors %}<div class="text-danger mt-1" style="font-size: 0.85rem;">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            <label for="{{ form.description.id_for_label }}" class="form-label fw-medium" style="font-size: 0.9rem;">Description</label>
+            {{ form.description }}
+            {% for error in form.description.errors %}<div class="text-danger mt-1" style="font-size: 0.85rem;">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="mb-4">
+            <label for="{{ form.keywords_input.id_for_label }}" class="form-label fw-medium" style="font-size: 0.9rem;">{{ form.keywords_input.label }}</label>
+            {{ form.keywords_input }}
+            <small class="text-muted">{{ form.keywords_input.help_text }}</small>
+            {% for error in form.keywords_input.errors %}<div class="text-danger mt-1" style="font-size: 0.85rem;">{{ error }}</div>{% endfor %}
+          </div>
+
+          <p class="section-label">Temporal</p>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label for="{{ form.datetime_start.id_for_label }}" class="form-label fw-medium" style="font-size: 0.9rem;">Start Datetime</label>
+              {{ form.datetime_start }}
+              {% for error in form.datetime_start.errors %}<div class="text-danger mt-1" style="font-size: 0.85rem;">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              <label for="{{ form.datetime_end.id_for_label }}" class="form-label fw-medium" style="font-size: 0.9rem;">End Datetime</label>
+              {{ form.datetime_end }}
+              {% for error in form.datetime_end.errors %}<div class="text-danger mt-1" style="font-size: 0.85rem;">{{ error }}</div>{% endfor %}
+            </div>
+          </div>
+
+          <p class="section-label">Rights and Providers</p>
+          <div class="mb-3">
+            <label for="{{ form.license.id_for_label }}" class="form-label fw-medium" style="font-size: 0.9rem;">License</label>
+            {{ form.license }}
+            {% for error in form.license.errors %}<div class="text-danger mt-1" style="font-size: 0.85rem;">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="mb-4">
+            <label for="{{ form.providers_input.id_for_label }}" class="form-label fw-medium" style="font-size: 0.9rem;">{{ form.providers_input.label }}</label>
+            {{ form.providers_input }}
+            <small class="text-muted">{{ form.providers_input.help_text }}</small>
+            {% for error in form.providers_input.errors %}<div class="text-danger mt-1" style="font-size: 0.85rem;">{{ error }}</div>{% endfor %}
+          </div>
+
+          <p class="section-label">Links</p>
+          <div class="mb-4">
+            <label for="{{ form.links_input.id_for_label }}" class="form-label fw-medium" style="font-size: 0.9rem;">{{ form.links_input.label }}</label>
+            {{ form.links_input }}
+            <small class="text-muted">{{ form.links_input.help_text }}</small>
+            {% for error in form.links_input.errors %}<div class="text-danger mt-1" style="font-size: 0.85rem;">{{ error }}</div>{% endfor %}
+          </div>
+
+          <hr>
+          <div class="d-grid d-md-flex gap-2">
+            <button type="submit" class="btn btn-gma">
+              <i class="bi bi-save me-1"></i>Save Draft
+            </button>
+          </div>
+        </form>
+
+        <form method="post" action="{% url 'export_stac' project.pk upload.pk %}" class="d-grid d-md-flex gap-2 mt-2">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline-secondary">
+            <i class="bi bi-download me-1"></i>Export STAC JSON
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-5">
+    <div class="card border-0 shadow-sm" style="position: sticky; top: 1rem;">
+      <div class="card-header card-header-pale border-0">
+        <h6 class="fw-semibold mb-0"><i class="bi bi-chat-dots me-2"></i>Metadata Assistant</h6>
+      </div>
+      <div class="card-body">
+        <p class="text-muted mb-3" style="font-size: 0.9rem;">
+          AI-powered metadata suggestions coming soon.
+        </p>
+
+        <p class="section-label mb-2">Extracted Technical Metadata</p>
+        <table class="table table-sm table-borderless mb-3" style="font-size: 0.85rem;">
+          <tbody>
+            <tr>
+              <td class="text-muted" style="width: 45%;">CRS / EPSG</td>
+              <td>{{ extracted.crs_epsg|default:"—" }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted">Geometry Type</td>
+              <td>{{ extracted.geometry_type|default:"—" }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted">Feature Count</td>
+              <td>{{ extracted.feature_count|intcomma }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted">Bounding Box</td>
+              <td style="font-size: 0.8rem;">{{ extracted.bbox_display }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="p-3 border-top">
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="Ask about STAC metadata..." disabled>
+          <button class="btn btn-gma" disabled><i class="bi bi-send"></i></button>
+        </div>
+        <small class="text-muted d-block mt-2" style="font-size: 0.8rem;">
+          Powered by RAG over the STAC specification (coming soon)
+        </small>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

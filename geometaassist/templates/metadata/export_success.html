@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Export Successful — {{ upload.original_filename }}{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none">Projects</a></li>
+<li class="breadcrumb-item"><a href="{% url 'project_detail' project.pk %}" class="text-decoration-none">{{ project.name }}</a></li>
+<li class="breadcrumb-item"><a href="{% url 'upload_detail' project.pk upload.pk %}" class="text-decoration-none">{{ upload.original_filename }}</a></li>
+<li class="breadcrumb-item active">Export</li>
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 720px;">
+  <div class="alert d-flex align-items-center gap-3 mb-4"
+       style="background: var(--gma-green-light); border: 1px solid var(--gma-green-accent); color: var(--gma-green-dark);">
+    <i class="bi bi-check-circle-fill fs-3"></i>
+    <div>
+      <div class="fw-semibold">STAC Item exported successfully</div>
+      <div style="font-size: 0.9rem;">Your metadata has been assembled into a valid STAC 1.0.0 Item.</div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-header card-header-pale border-0">
+      <h6 class="fw-semibold mb-0">Export Details</h6>
+    </div>
+    <div class="card-body">
+      <table class="table table-borderless mb-0">
+        <tbody>
+          <tr>
+            <td class="text-muted fw-medium" style="width: 35%; font-size: 0.9rem;">STAC Item ID</td>
+            <td style="font-size: 0.9rem;">{{ record.stac_item_id|default:"—" }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-medium" style="font-size: 0.9rem;">Title</td>
+            <td style="font-size: 0.9rem;">{{ record.title|default:"—" }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-medium" style="font-size: 0.9rem;">STAC Version</td>
+            <td style="font-size: 0.9rem;">{{ record.stac_version }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-medium" style="font-size: 0.9rem;">Export Count</td>
+            <td style="font-size: 0.9rem;">{{ record.export_count }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-medium" style="font-size: 0.9rem;">Last Exported</td>
+            <td style="font-size: 0.9rem;">{{ record.last_exported_at|date:"d M Y, H:i" }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-header card-header-pale border-0 d-flex justify-content-between align-items-center">
+      <h6 class="fw-semibold mb-0">JSON Preview</h6>
+    </div>
+    <div class="card-body p-0">
+      <pre class="mb-0 p-3"
+           style="background: #1a1a1a; color: #d4d4d4; border-radius: 0 0 8px 8px;
+                  font-size: 0.85rem; overflow-x: auto; overflow-y: auto; max-height: 400px;">{{ pretty_json|escape }}</pre>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <a href="{% url 'download_stac' project.pk upload.pk %}" class="btn btn-gma">
+      <i class="bi bi-download me-1"></i>Download JSON
+    </a>
+    <a href="{% url 'project_detail' project.pk %}" class="btn btn-outline-secondary">Back to Project</a>
+  </div>
+</div>
+{% endblock %}

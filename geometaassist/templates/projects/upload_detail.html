@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 {% block title %}{{ upload.original_filename }} — {{ project.name }}{% endblock %}
 {% block nav_dashboard %}active{% endblock %}
 
@@ -14,64 +15,178 @@
 </h1>
 <p class="text-muted mb-4" style="font-size: 0.9rem;">
   Uploaded {{ upload.uploaded_at|date:"d M Y" }}
+  &middot; {{ upload.file_size_bytes|filesizeformat }}
   &middot; Status: <span class="badge {{ upload.status_badge_class }}">{{ upload.get_upload_status_display }}</span>
 </p>
 
 <div class="row g-4">
   <div class="col-12 col-lg-7">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header card-header-pale border-0">
-        <h6 class="fw-semibold mb-0"><i class="bi bi-info-circle me-2"></i>Upload Information</h6>
+    {% if upload.upload_status == 'complete' %}
+      {% with meta=upload.extracted_metadata %}
+        <div class="card border-0 shadow-sm">
+          <div class="card-header card-header-pale border-0">
+            <h6 class="fw-semibold mb-0"><i class="bi bi-cpu me-2"></i>Extracted Technical Metadata</h6>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-borderless mb-0">
+              <tbody>
+                <tr>
+                  <td class="text-muted fw-medium ps-4" style="width: 40%; font-size: 0.875rem;">CRS / EPSG</td>
+                  <td style="font-size: 0.875rem;">{{ meta.crs_epsg|default:"—" }}</td>
+                </tr>
+                <tr class="bg-light">
+                  <td class="text-muted fw-medium ps-4" style="font-size: 0.875rem;">Bounding Box</td>
+                  <td style="font-size: 0.875rem;">{{ meta.bbox_display }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted fw-medium ps-4" style="font-size: 0.875rem;">Geometry Type</td>
+                  <td style="font-size: 0.875rem;">{{ meta.geometry_type|default:"—" }}</td>
+                </tr>
+                <tr class="bg-light">
+                  <td class="text-muted fw-medium ps-4" style="font-size: 0.875rem;">Feature Count</td>
+                  <td style="font-size: 0.875rem;">{{ meta.feature_count|intcomma }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted fw-medium ps-4 align-top" style="font-size: 0.875rem;">Attribute Schema</td>
+                  <td style="font-size: 0.875rem;">
+                    {% if meta.attribute_schema %}
+                      <table class="table table-sm mb-0" style="font-size: 0.825rem;">
+                        <thead>
+                          <tr><th>Attribute Name</th><th>Data Type</th></tr>
+                        </thead>
+                        <tbody>
+                          {% for attr in meta.attribute_schema %}
+                            <tr>
+                              <td><code>{{ attr.name }}</code></td>
+                              <td class="text-muted">{{ attr.dtype }}</td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    {% else %}
+                      <span class="text-muted">No attributes</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      {% endwith %}
+
+    {% elif upload.upload_status == 'processing' %}
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+          <div class="spinner-border mb-3" style="color: var(--gma-green-mid);" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <h6 class="fw-semibold mb-1">Extraction in progress</h6>
+          <p class="text-muted mb-0" style="font-size: 0.9rem;">Please wait...</p>
+        </div>
       </div>
-      <div class="card-body p-0">
-        <table class="table table-borderless mb-0">
-          <tbody>
-            <tr>
-              <td class="text-muted fw-medium ps-4" style="width: 40%; font-size: 0.875rem;">Filename</td>
-              <td style="font-size: 0.875rem;">{{ upload.original_filename }}</td>
-            </tr>
-            <tr class="bg-light">
-              <td class="text-muted fw-medium ps-4" style="font-size: 0.875rem;">File size</td>
-              <td style="font-size: 0.875rem;">{{ upload.file_size_bytes|filesizeformat }}</td>
-            </tr>
-            <tr>
-              <td class="text-muted fw-medium ps-4" style="font-size: 0.875rem;">Uploaded</td>
-              <td style="font-size: 0.875rem;">{{ upload.uploaded_at|date:"d M Y, H:i" }}</td>
-            </tr>
-            <tr class="bg-light">
-              <td class="text-muted fw-medium ps-4" style="font-size: 0.875rem;">Status</td>
-              <td style="font-size: 0.875rem;">
-                <span class="badge {{ upload.status_badge_class }}">{{ upload.get_upload_status_display }}</span>
-              </td>
-            </tr>
-            {% if upload.error_message %}
-              <tr>
-                <td class="text-muted fw-medium ps-4" style="font-size: 0.875rem;">Error</td>
-                <td style="font-size: 0.875rem;" class="text-danger">{{ upload.error_message }}</td>
-              </tr>
-            {% endif %}
-          </tbody>
-        </table>
+
+    {% elif upload.upload_status == 'error' %}
+      <div class="card border-danger shadow-sm">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-start gap-3">
+            <i class="bi bi-exclamation-triangle text-danger" style="font-size: 1.75rem;"></i>
+            <div class="flex-grow-1">
+              <h6 class="fw-semibold text-danger mb-1">Extraction failed</h6>
+              <p class="text-muted mb-3" style="font-size: 0.875rem; word-break: break-word;">
+                {{ upload.error_message|default:"An unknown error occurred." }}
+              </p>
+              <form method="post" action="{% url 'retry_extraction' project.pk upload.pk %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                  <i class="bi bi-arrow-clockwise me-1"></i>Retry Extraction
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+
+    {% else %}
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+          <i class="bi bi-hourglass d-block mb-2 text-muted" style="font-size: 2rem;"></i>
+          <h6 class="fw-semibold mb-1">Extraction pending</h6>
+          <p class="text-muted mb-0" style="font-size: 0.9rem;">Extraction has not started yet.</p>
+        </div>
+      </div>
+    {% endif %}
   </div>
 
   <div class="col-12 col-lg-5">
     <div class="card border-0 shadow-sm">
       <div class="card-header card-header-pale border-0">
-        <h6 class="fw-semibold mb-0"><i class="bi bi-hourglass-split me-2"></i>Extraction Status</h6>
+        <h6 class="fw-semibold mb-0"><i class="bi bi-stars me-2"></i>AI Status</h6>
       </div>
-      <div class="card-body text-center py-4">
-        <i class="bi bi-hourglass-split d-block mb-2" style="font-size: 2rem; color: var(--gma-green-mid);"></i>
-        <p class="text-muted mb-0" style="font-size: 0.9rem;">
-          Metadata extraction will run automatically. Check back shortly.
-        </p>
+      <div class="card-body">
+        <div class="d-flex align-items-start gap-3 mb-3">
+          {% if upload.upload_status == 'complete' %}
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                 style="width: 32px; height: 32px; background: var(--gma-green-light);">
+              <i class="bi bi-check-circle" style="color: var(--gma-green-dark);"></i>
+            </div>
+            <div>
+              <div class="fw-medium" style="font-size: 0.9rem;">Step 1: Technical Extraction</div>
+              <small class="text-muted">Complete</small>
+            </div>
+          {% elif upload.upload_status == 'error' %}
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                 style="width: 32px; height: 32px; background: #f8d7da;">
+              <i class="bi bi-x-circle text-danger"></i>
+            </div>
+            <div>
+              <div class="fw-medium" style="font-size: 0.9rem;">Step 1: Technical Extraction</div>
+              <small class="text-danger">Failed</small>
+            </div>
+          {% else %}
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                 style="width: 32px; height: 32px; background: #f1f3f5;">
+              <i class="bi bi-hourglass text-muted"></i>
+            </div>
+            <div>
+              <div class="fw-medium" style="font-size: 0.9rem;">Step 1: Technical Extraction</div>
+              <small class="text-muted">Pending</small>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="d-flex align-items-start gap-3 mb-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+               style="width: 32px; height: 32px; background: #f1f3f5;">
+            <i class="bi bi-hourglass text-muted"></i>
+          </div>
+          <div>
+            <div class="fw-medium" style="font-size: 0.9rem;">Step 2: AI Suggestions Generated</div>
+            <small class="text-muted">Coming soon</small>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-start gap-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+               style="width: 32px; height: 32px; background: #f1f3f5;">
+            <i class="bi bi-hourglass text-muted"></i>
+          </div>
+          <div>
+            <div class="fw-medium" style="font-size: 0.9rem;">Step 3: Your Review</div>
+            <small class="text-muted">Pending</small>
+          </div>
+        </div>
       </div>
     </div>
 
-    <button type="button" class="btn btn-gma w-100 mt-3" disabled>
-      <i class="bi bi-pencil-square me-1"></i>Review and Edit Metadata
-    </button>
+    {% if upload.upload_status == 'complete' %}
+      <a href="{% url 'metadata_editor' project.pk upload.pk %}" class="btn btn-gma w-100 mt-3">
+        <i class="bi bi-pencil-square me-1"></i>Review and Edit Metadata
+      </a>
+    {% else %}
+      <button type="button" class="btn btn-gma w-100 mt-3" disabled>
+        <i class="bi bi-pencil-square me-1"></i>Review and Edit Metadata
+      </button>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
