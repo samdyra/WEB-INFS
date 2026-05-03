@@ -113,3 +113,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
+CHROMA_PERSIST_DIR = os.environ.get(
+    'CHROMA_PERSIST_DIR',
+    str(BASE_DIR / 'rag' / 'chroma_store'),
+)
