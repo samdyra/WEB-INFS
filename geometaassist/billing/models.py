@@ -54,3 +54,24 @@ class UserSubscription(models.Model):
     @property
     def is_pro(self):
         return self.plan.name.lower() == 'pro'
+
+
+class AICallUsage(models.Model):
+
+    class CallType(models.TextChoices):
+        SUGGESTION = 'suggestion', 'Suggestion'
+        CHAT       = 'chat',       'Chat'
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='ai_calls',
+    )
+    call_type = models.CharField(max_length=20, choices=CallType.choices)
+    called_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-called_at']
+
+    def __str__(self):
+        return f'{self.user.email} - {self.call_type} at {self.called_at}'
