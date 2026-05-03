@@ -28,4 +28,14 @@ urlpatterns = [
         views.download_stac,
         name='download_stac',
     ),
+    path(
+        'metadata/<int:project_pk>/uploads/<int:upload_pk>/ai-suggest/',
+        views.ai_suggest,
+        name='ai_suggest',
+    ),
+    path(
+        'metadata/<int:project_pk>/uploads/<int:upload_pk>/ai-chat/',
+        views.ai_chat,
+        name='ai_chat',
+    ),
 ]

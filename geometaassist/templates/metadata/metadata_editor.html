@@ -29,6 +29,12 @@
             </div>
           {% endif %}
 
+          <button type="button" id="ai-suggest-btn" class="btn btn-gma mb-2"
+                  data-url="{% url 'ai_suggest' project.pk upload.pk %}">
+            <i class="bi bi-magic me-1"></i>Generate AI Suggestions
+          </button>
+          <div id="ai-suggest-status" class="small text-muted mb-3"></div>
+
           <p class="section-label">Identification</p>
           <div class="mb-3">
             <label for="{{ form.stac_item_id.id_for_label }}" class="form-label fw-medium" style="font-size: 0.9rem;">STAC Item ID</label>
@@ -111,10 +117,6 @@
         <h6 class="fw-semibold mb-0"><i class="bi bi-chat-dots me-2"></i>Metadata Assistant</h6>
       </div>
       <div class="card-body">
-        <p class="text-muted mb-3" style="font-size: 0.9rem;">
-          AI-powered metadata suggestions coming soon.
-        </p>
-
         <p class="section-label mb-2">Extracted Technical Metadata</p>
         <table class="table table-sm table-borderless mb-3" style="font-size: 0.85rem;">
           <tbody>
@@ -136,17 +138,148 @@
             </tr>
           </tbody>
         </table>
+
+        <p class="section-label mb-2">Ask the Assistant</p>
+        <div id="chat-messages"
+             style="height: 280px; overflow-y: auto; background: var(--gma-green-pale); border: 1px solid var(--gma-border); border-radius: 6px; padding: 0.75rem; font-size: 0.85rem;">
+          <div class="text-muted small">
+            Ask about STAC metadata fields, best practices, or how to fill in this form.
+          </div>
+        </div>
       </div>
       <div class="p-3 border-top">
-        <div class="input-group">
-          <input type="text" class="form-control" placeholder="Ask about STAC metadata..." disabled>
-          <button class="btn btn-gma" disabled><i class="bi bi-send"></i></button>
-        </div>
+        <form id="chat-form" class="input-group"
+              data-url="{% url 'ai_chat' project.pk upload.pk %}">
+          <input type="text" id="chat-input" class="form-control"
+                 placeholder="Ask about STAC metadata..." required autocomplete="off">
+          <button type="submit" class="btn btn-gma"><i class="bi bi-send"></i></button>
+        </form>
         <small class="text-muted d-block mt-2" style="font-size: 0.8rem;">
-          Powered by RAG over the STAC specification (coming soon)
+          Powered by RAG over the STAC specification.
         </small>
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  const suggestBtn = document.getElementById('ai-suggest-btn');
+  const suggestStatus = document.getElementById('ai-suggest-status');
+
+  suggestBtn.addEventListener('click', async function () {
+    suggestBtn.disabled = true;
+    suggestStatus.className = 'small text-muted mb-3';
+    suggestStatus.textContent = 'Generating suggestions...';
+    try {
+      const res = await fetch(suggestBtn.dataset.url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrf},
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Request failed.');
+
+      const titleField = document.getElementById('{{ form.title.id_for_label }}');
+      const descField = document.getElementById('{{ form.description.id_for_label }}');
+      const kwField = document.getElementById('{{ form.keywords_input.id_for_label }}');
+      const licenseField = document.getElementById('{{ form.license.id_for_label }}');
+      const providersField = document.getElementById('{{ form.providers_input.id_for_label }}');
+      const linksField = document.getElementById('{{ form.links_input.id_for_label }}');
+      if (data.title) titleField.value = data.title;
+      if (data.description) descField.value = data.description;
+      if (Array.isArray(data.keywords)) kwField.value = data.keywords.join(', ');
+      if (data.license) {
+        const valid = Array.from(licenseField.options).some(o => o.value === data.license);
+        if (valid) licenseField.value = data.license;
+      }
+      if (Array.isArray(data.providers)) providersField.value = JSON.stringify(data.providers, null, 2);
+      if (Array.isArray(data.links)) linksField.value = JSON.stringify(data.links, null, 2);
+
+      suggestStatus.className = 'small text-success mb-3';
+      suggestStatus.textContent = 'Suggestions applied. Review and save when ready.';
+    } catch (err) {
+      suggestStatus.className = 'small text-danger mb-3';
+      suggestStatus.textContent = err.message;
+    } finally {
+      suggestBtn.disabled = false;
+    }
+  });
+
+  const chatForm = document.getElementById('chat-form');
+  const chatInput = document.getElementById('chat-input');
+  const chatMessages = document.getElementById('chat-messages');
+  const conversationHistory = [];
+
+  function appendBubble(role, text) {
+    const wrap = document.createElement('div');
+    wrap.className = 'd-flex mb-2 ' + (role === 'user' ? 'justify-content-end' : 'justify-content-start');
+    const bubble = document.createElement('div');
+    bubble.style.maxWidth = '85%';
+    bubble.style.padding = '0.4rem 0.65rem';
+    bubble.style.borderRadius = '8px';
+    bubble.style.whiteSpace = 'pre-wrap';
+    bubble.style.background = role === 'user' ? 'var(--gma-green-light)' : '#ffffff';
+    bubble.style.border = '1px solid var(--gma-border)';
+    bubble.textContent = text;
+    wrap.appendChild(bubble);
+    chatMessages.appendChild(wrap);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return bubble;
+  }
+
+  function collectMetadataContext() {
+    const get = id => {
+      const el = document.getElementById(id);
+      return el ? el.value : '';
+    };
+    return {
+      title:          get('{{ form.title.id_for_label }}'),
+      description:    get('{{ form.description.id_for_label }}'),
+      keywords:       get('{{ form.keywords_input.id_for_label }}'),
+      license:        get('{{ form.license.id_for_label }}'),
+      datetime_start: get('{{ form.datetime_start.id_for_label }}'),
+      datetime_end:   get('{{ form.datetime_end.id_for_label }}'),
+    };
+  }
+
+  chatForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const message = chatInput.value.trim();
+    if (!message) return;
+
+    appendBubble('user', message);
+    conversationHistory.push({role: 'user', content: message});
+    chatInput.value = '';
+
+    const typing = appendBubble('assistant', 'Thinking...');
+    typing.style.fontStyle = 'italic';
+    typing.style.opacity = '0.7';
+
+    try {
+      const res = await fetch(chatForm.dataset.url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrf},
+        body: JSON.stringify({
+          message: message,
+          history: conversationHistory,
+          metadata_context: collectMetadataContext(),
+        }),
+      });
+      const data = await res.json();
+      typing.remove();
+      if (!res.ok) throw new Error(data.error || 'Request failed.');
+      appendBubble('assistant', data.response);
+      conversationHistory.push({role: 'assistant', content: data.response});
+    } catch (err) {
+      typing.remove();
+      const bubble = appendBubble('assistant', 'Error: ' + err.message);
+      bubble.style.color = 'var(--bs-danger, #dc3545)';
+    }
+  });
+})();
+</script>
 {% endblock %}

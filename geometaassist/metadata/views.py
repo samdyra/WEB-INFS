@@ -2,16 +2,18 @@ import json
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_POST
 
+from billing.quota import can_use_ai, record_ai_call
 from projects.models import GeoDataProject, GeoJSONUpload
 
 from .extractor import extract_metadata
 from .forms import MetadataRecordForm
 from .models import MetadataRecord
+from .rag_service import chat_with_rag, generate_suggestions
 from .stac_builder import build_stac_item
 
 
@@ -128,3 +130,72 @@ def download_stac(request, project_pk, upload_pk):
     filename = f'{record.stac_item_id or upload_pk}_stac.json'
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     return response
+
+
+@require_POST
+@login_required
+def ai_suggest(request, project_pk, upload_pk):
+    upload = _get_user_upload(request, project_pk, upload_pk)
+
+    allowed, error = can_use_ai(request.user)
+    if not allowed:
+        return JsonResponse({'error': error}, status=403)
+
+    extracted = getattr(upload, 'extracted_metadata', None)
+    if extracted is None:
+        return JsonResponse(
+            {'error': 'No technical metadata available for this upload.'},
+            status=400,
+        )
+
+    metadata_dict = {
+        'crs_epsg':         extracted.crs_epsg,
+        'geometry_type':    extracted.geometry_type,
+        'feature_count':    extracted.feature_count,
+        'attribute_schema': extracted.attribute_schema,
+        'bbox_display':     extracted.bbox_display,
+    }
+
+    try:
+        suggestions = generate_suggestions(metadata_dict)
+    except Exception as e:
+        return JsonResponse({'error': f'AI service error: {e}'}, status=500)
+
+    record, _ = MetadataRecord.objects.get_or_create(
+        upload=upload, defaults={'user': request.user},
+    )
+    record.ai_suggestions_applied = True
+    record.save(update_fields=['ai_suggestions_applied', 'updated_at'])
+
+    record_ai_call(request.user, 'suggestion')
+    return JsonResponse(suggestions)
+
+
+@require_POST
+@login_required
+def ai_chat(request, project_pk, upload_pk):
+    upload = _get_user_upload(request, project_pk, upload_pk)
+
+    allowed, error = can_use_ai(request.user)
+    if not allowed:
+        return JsonResponse({'error': error}, status=403)
+
+    try:
+        body = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON body.'}, status=400)
+
+    message = (body.get('message') or '').strip()
+    history = body.get('history') or []
+    metadata_context = body.get('metadata_context') or {}
+
+    if not message:
+        return JsonResponse({'error': 'Message cannot be empty.'}, status=400)
+
+    try:
+        reply = chat_with_rag(message, history, metadata_context)
+    except Exception as e:
+        return JsonResponse({'error': f'AI service error: {e}'}, status=500)
+
+    record_ai_call(request.user, 'chat')
+    return JsonResponse({'response': reply})
