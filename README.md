@@ -36,3 +36,6 @@ The app will be available at `http://127.0.0.1:8000/` (by default).
 | 15 | Admin subscription edit     | `admin_subscription_edit.html` | `/admin-portal/subscriptions/<id>/edit/` | `admin_subscription_edit()`  |
 
 All views are defined in `mockup/views.py` and routes in `mockup/urls.py`.
+
+
+how to ingest: python manage.py ingest_stac_spec

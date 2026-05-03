@@ -10,5 +10,6 @@ env/
 .DS_Store
 media/
 staticfiles/
+rag/chroma_store/
 .idea/
 .vscode/
