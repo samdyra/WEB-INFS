@@ -1,6 +1,8 @@
+from django.utils import timezone
+
 from projects.models import GeoDataProject, GeoJSONUpload
 
-from .models import UserSubscription
+from .models import AICallUsage, UserSubscription
 
 
 def _get_subscription(user):
@@ -31,3 +33,28 @@ def can_upload_file(user, project):
     if current >= limit:
         return False, limit
     return True, None
+
+
+def can_use_ai(user):
+    sub = _get_subscription(user)
+    if sub is None:
+        return False, 'No active subscription.'
+
+    limit = sub.plan.max_ai_calls_per_month
+    if limit is None:
+        return True, None
+
+    now = timezone.now()
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    used = AICallUsage.objects.filter(user=user, called_at__gte=month_start).count()
+
+    if used >= limit:
+        return False, (
+            f'You have used {used} of {limit} AI calls this month. '
+            'Upgrade to Pro for unlimited calls.'
+        )
+    return True, None
+
+
+def record_ai_call(user, call_type):
+    AICallUsage.objects.create(user=user, call_type=call_type)
