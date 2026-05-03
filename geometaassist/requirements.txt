@@ -2,3 +2,8 @@ django>=5.0
 mysqlclient
 python-dotenv
 geopandas
+langchain
+langchain-openai
+langchain-community
+langchain-text-splitters
+chromadb
