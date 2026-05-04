@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -13,7 +14,7 @@ from .models import GeoDataProject, GeoJSONUpload
 
 @login_required
 def dashboard(request):
-    projects = GeoDataProject.objects.filter(
+    projects_qs = GeoDataProject.objects.filter(
         user=request.user, is_deleted=False
     ).order_by('-updated_at')
     total_uploads = GeoJSONUpload.objects.filter(
@@ -21,9 +22,14 @@ def dashboard(request):
         project__is_deleted=False,
         is_deleted=False,
     ).count()
+
+    paginator = Paginator(projects_qs, 10)
+    page = paginator.get_page(request.GET.get('page'))
+
     return render(request, 'projects/dashboard.html', {
-        'projects': projects,
-        'project_count': projects.count(),
+        'projects':      page.object_list,
+        'page':          page,
+        'project_count': projects_qs.count(),
         'total_uploads': total_uploads,
     })
 
@@ -50,11 +56,16 @@ def project_detail(request, pk):
     project = get_object_or_404(
         GeoDataProject, pk=pk, user=request.user, is_deleted=False
     )
-    uploads = project.uploads.filter(is_deleted=False).order_by('-uploaded_at')
+    uploads_qs = project.uploads.filter(is_deleted=False).order_by('-uploaded_at')
+
+    paginator = Paginator(uploads_qs, 10)
+    page = paginator.get_page(request.GET.get('page'))
+
     return render(request, 'projects/project_detail.html', {
-        'project': project,
-        'uploads': uploads,
-        'upload_count': uploads.count(),
+        'project':      project,
+        'uploads':      page.object_list,
+        'page':         page,
+        'upload_count': uploads_qs.count(),
     })
 
 
@@ -128,9 +139,51 @@ def upload_detail(request, project_pk, upload_pk):
     upload = get_object_or_404(
         GeoJSONUpload, pk=upload_pk, project=project, is_deleted=False
     )
+    record = getattr(upload, 'metadata_record', None)
     return render(request, 'projects/upload_detail.html', {
         'project': project,
-        'upload': upload,
+        'upload':  upload,
+        'record':  record,
+    })
+
+
+@login_required
+def upload_history(request):
+    base_qs = GeoJSONUpload.objects.filter(
+        project__user=request.user,
+        project__is_deleted=False,
+        is_deleted=False,
+    ).select_related('project').order_by('-uploaded_at')
+
+    total_count = base_qs.count()
+    complete_count = base_qs.filter(
+        upload_status=GeoJSONUpload.UploadStatus.COMPLETE,
+    ).count()
+    error_count = base_qs.filter(
+        upload_status=GeoJSONUpload.UploadStatus.ERROR,
+    ).count()
+
+    q = request.GET.get('q', '').strip()
+    status = request.GET.get('status', '').strip()
+
+    uploads = base_qs
+    if q:
+        uploads = uploads.filter(original_filename__icontains=q)
+    if status and status in GeoJSONUpload.UploadStatus.values:
+        uploads = uploads.filter(upload_status=status)
+
+    paginator = Paginator(uploads, 10)
+    page = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'projects/upload_history.html', {
+        'page':           page,
+        'uploads':        page.object_list,
+        'total_count':    total_count,
+        'complete_count': complete_count,
+        'error_count':    error_count,
+        'q':              q,
+        'status':         status,
+        'status_choices': GeoJSONUpload.UploadStatus.choices,
     })
 
 

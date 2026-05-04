@@ -33,7 +33,7 @@
   </a>
 </div>
 
-<div class="card border-0 shadow-sm">
+<div class="card border-0 shadow-sm mb-3">
   <div class="table-responsive">
     <table class="table table-hover mb-0">
       <thead class="table-light">
@@ -73,6 +73,30 @@
     </table>
   </div>
 </div>
+
+{% if page.paginator.num_pages > 1 %}
+  <nav aria-label="Uploads pagination" class="mb-3">
+    <ul class="pagination justify-content-center mb-0">
+      {% if page.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ page.previous_page_number }}">Previous</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+      {% endif %}
+      {% for num in page.paginator.page_range %}
+        {% if num == page.number %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% else %}
+          <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+        {% endif %}
+      {% endfor %}
+      {% if page.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page.next_page_number }}">Next</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
 
 {% for upload in uploads %}
   <div class="modal fade" id="deleteUploadModal{{ upload.pk }}" tabindex="-1" aria-hidden="true">

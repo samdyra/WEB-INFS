@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}Upload History — GeoMetaAssist{% endblock %}
+{% block nav_uploads %}active{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Upload History</li>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title mb-4">Upload History</h1>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: var(--gma-green-light);">
+          <i class="bi bi-cloud-upload fs-5" style="color: var(--gma-green-dark);"></i>
+        </div>
+        <div>
+          <div class="text-muted" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em;">Total Uploads</div>
+          <div class="fw-bold fs-4">{{ total_count }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: var(--gma-green-light);">
+          <i class="bi bi-check-circle fs-5" style="color: var(--gma-green-dark);"></i>
+        </div>
+        <div>
+          <div class="text-muted" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em;">Complete</div>
+          <div class="fw-bold fs-4">{{ complete_count }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: #fde8e8;">
+          <i class="bi bi-exclamation-circle fs-5 text-danger"></i>
+        </div>
+        <div>
+          <div class="text-muted" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em;">Errors</div>
+          <div class="fw-bold fs-4">{{ error_count }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if total_count == 0 %}
+  <div class="card border-0 shadow-sm">
+    <div class="card-body text-center py-5">
+      <i class="bi bi-cloud-upload fs-1 text-muted mb-3 d-block"></i>
+      <h5 class="fw-semibold mb-2">No uploads yet</h5>
+      <p class="text-muted mb-3" style="font-size: 0.9rem;">
+        Upload your first GeoJSON file to get started.
+      </p>
+      <a href="{% url 'dashboard' %}" class="btn btn-gma">
+        <i class="bi bi-folder2 me-1"></i>Go to My Projects
+      </a>
+    </div>
+  </div>
+{% else %}
+  <form method="get" class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+      <div class="row g-2 align-items-end">
+        <div class="col-12 col-md-7">
+          <label for="q" class="form-label fw-medium" style="font-size: 0.85rem;">Filename search</label>
+          <input type="text" id="q" name="q" value="{{ q }}" class="form-control"
+                 placeholder="Search by filename...">
+        </div>
+        <div class="col-8 col-md-3">
+          <label for="status" class="form-label fw-medium" style="font-size: 0.85rem;">Status</label>
+          <select id="status" name="status" class="form-select">
+            <option value="">All</option>
+            {% for value, label in status_choices %}
+              <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-4 col-md-2 d-grid">
+          <button type="submit" class="btn btn-gma">
+            <i class="bi bi-funnel me-1"></i>Filter
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      {% if uploads %}
+        <div class="table-responsive">
+          <table class="table mb-0" style="font-size: 0.9rem;">
+            <thead style="background: var(--gma-green-pale);">
+              <tr>
+                <th class="border-0 fw-semibold">Filename</th>
+                <th class="border-0 fw-semibold">Project</th>
+                <th class="border-0 fw-semibold">Uploaded</th>
+                <th class="border-0 fw-semibold">Status</th>
+                <th class="border-0 fw-semibold text-end pe-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for upload in uploads %}
+                <tr>
+                  <td class="align-middle">{{ upload.original_filename }}</td>
+                  <td class="align-middle">
+                    <a href="{% url 'project_detail' upload.project.pk %}"
+                       class="text-decoration-none" style="color: var(--gma-green-dark);">
+                      {{ upload.project.name }}
+                    </a>
+                  </td>
+                  <td class="align-middle text-muted">{{ upload.uploaded_at|date:"M d, Y H:i" }}</td>
+                  <td class="align-middle">
+                    <span class="badge {{ upload.status_badge_class }}">
+                      {{ upload.get_upload_status_display }}
+                    </span>
+                  </td>
+                  <td class="align-middle text-end pe-3">
+                    <a href="{% url 'upload_detail' upload.project.pk upload.pk %}"
+                       class="btn btn-sm btn-outline-secondary">View</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-5">
+          <i class="bi bi-search fs-3 text-muted mb-2 d-block"></i>
+          <p class="text-muted mb-0" style="font-size: 0.9rem;">
+            No uploads match your filters.
+          </p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if page.paginator.num_pages > 1 %}
+    <nav aria-label="Upload history pagination" class="mt-3">
+      <ul class="pagination justify-content-center mb-0">
+        {% if page.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Previous</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Previous</span></li>
+        {% endif %}
+
+        {% for num in page.paginator.page_range %}
+          {% if num == page.number %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+          {% else %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}{% if q %}&q={{ q }}{% endif %}{% if status %}&status={{ status }}{% endif %}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if status %}&status={{ status }}{% endif %}">Next</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Next</span></li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+{% endif %}
+{% endblock %}

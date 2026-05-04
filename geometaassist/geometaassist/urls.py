@@ -11,6 +11,7 @@ urlpatterns = [
     path('', account_views.landing_view, name='landing'),
     path('accounts/', include('accounts.urls')),
     path('dashboard/', project_views.dashboard, name='dashboard'),
+    path('upload-history/', project_views.upload_history, name='upload_history'),
     path('projects/', include('projects.urls')),
     path('', include('billing.urls')),
     path('', include('metadata.urls')),

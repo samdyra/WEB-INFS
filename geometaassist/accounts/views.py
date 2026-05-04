@@ -12,7 +12,12 @@ from .forms import LoginForm, PasswordChangeForm, ProfileForm, RegisterForm
 def landing_view(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
-    return render(request, 'landing.html')
+    free_plan = SubscriptionPlan.objects.filter(name='Free').first()
+    pro_plan = SubscriptionPlan.objects.filter(name='Pro').first()
+    return render(request, 'landing.html', {
+        'free_plan': free_plan,
+        'pro_plan':  pro_plan,
+    })
 
 
 @require_http_methods(['GET', 'POST'])

@@ -22,7 +22,7 @@
     <a href="{% url 'dashboard' %}" class="nav-link {% block nav_dashboard %}{% endblock %}">
       <i class="bi bi-grid"></i> Dashboard
     </a>
-    <a href="#" class="nav-link {% block nav_uploads %}{% endblock %}">
+    <a href="{% url 'upload_history' %}" class="nav-link {% block nav_uploads %}{% endblock %}">
       <i class="bi bi-cloud-upload"></i> Upload History
     </a>
     <a href="{% url 'profile' %}" class="nav-link {% block nav_settings %}{% endblock %}">

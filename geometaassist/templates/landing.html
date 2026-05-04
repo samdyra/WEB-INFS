@@ -1,5 +1,5 @@
 {% extends "base_public.html" %}
-{% block title %}GeoMetaAssist — Geospatial Metadata Management{% endblock %}
+{% block title %}GeoMetaAssist — AI-Powered Geospatial Metadata{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -56,17 +56,16 @@
     margin-bottom: 0;
     line-height: 1.6;
   }
-  .feature-num {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    border: 1px solid var(--gma-border);
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--gma-green-light);
+    color: var(--gma-green-dark);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--gma-text-muted);
+    font-size: 1.1rem;
     flex-shrink: 0;
   }
 
@@ -83,11 +82,22 @@
     border: 1px solid var(--gma-border);
     border-radius: 8px;
     padding: 2rem;
+    background: #fff;
+    height: 100%;
+    position: relative;
   }
-  .pricing-card.featured {
+  .pricing-card.free {
     border-color: var(--gma-green-mid);
-    border-width: 2px;
   }
+  .pricing-card.pro {
+    background: var(--gma-green-dark);
+    color: #fff;
+    border-color: var(--gma-green-dark);
+  }
+  .pricing-card.pro .price,
+  .pricing-card.pro h5 { color: #fff; }
+  .pricing-card.pro ul li { color: rgba(255, 255, 255, 0.85); }
+  .pricing-card.pro ul li i { color: var(--gma-green-light); }
   .pricing-card h5 {
     font-size: 0.95rem;
     font-weight: 600;
@@ -103,6 +113,7 @@
     font-weight: 400;
     color: var(--gma-text-muted);
   }
+  .pricing-card.pro .price span { color: rgba(255, 255, 255, 0.7); }
   .pricing-card ul {
     list-style: none;
     padding: 0;
@@ -117,27 +128,28 @@
     color: var(--gma-green-mid);
     margin-right: 0.5rem;
   }
-
-  .cta-section {
-    padding: 3.5rem 0;
-    border-top: 1px solid var(--gma-border);
-    text-align: center;
-  }
-  .cta-section h2 {
-    font-size: 1.35rem;
+  .popular-badge {
+    position: absolute;
+    top: -12px;
+    right: 1.5rem;
+    background: var(--gma-green-accent);
+    color: #fff;
+    font-size: 0.75rem;
     font-weight: 600;
-    margin-bottom: 0.5rem;
-  }
-  .cta-section p {
-    font-size: 0.9rem;
-    color: var(--gma-text-muted);
-    margin-bottom: 1.5rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
   }
 
   footer {
     border-top: 1px solid var(--gma-border);
     padding: 1.5rem 0;
   }
+  footer a {
+    color: var(--gma-text-muted);
+    text-decoration: none;
+  }
+  footer a:hover { color: var(--gma-green-dark); }
 
   @media (max-width: 767.98px) {
     .hero-section { padding: 2.5rem 0 2rem; text-align: center; }
@@ -155,15 +167,15 @@
   <div class="container">
     <div class="row align-items-center g-4">
       <div class="col-lg-6">
-        <h1>Geospatial metadata management for STAC catalogs</h1>
+        <h1>AI-Powered Geospatial Metadata, Done Right</h1>
         <p class="lead">
-          Upload GeoJSON files, extract technical metadata automatically,
-          and export STAC-compliant catalog items. Built for spatial data teams
-          who need reliable metadata workflows.
+          Upload GeoJSON files and let GeoMetaAssist extract technical metadata,
+          suggest descriptive fields, and export valid STAC 1.0.0 records.
+          Built for spatial data teams who want clean catalog entries without the busywork.
         </p>
         <div class="d-flex gap-2 flex-wrap btn-group-hero">
-          <a href="{% url 'register' %}" class="btn btn-gma px-4">Get started</a>
-          <a href="{% url 'login' %}" class="btn btn-outline-secondary px-4">Sign in</a>
+          <a href="{% url 'register' %}" class="btn btn-gma px-4">Get Started Free</a>
+          <a href="{% url 'login' %}" class="btn btn-outline-secondary px-4">Sign In</a>
         </div>
       </div>
       <div class="col-lg-6">
@@ -183,35 +195,35 @@
 
 <section class="features-section">
   <div class="container">
-    <h2>How it works</h2>
-    <p class="text-muted mb-4" style="font-size: 0.9rem;">Three steps from raw GeoJSON to a complete STAC Item.</p>
+    <h2>Features</h2>
+    <p class="text-muted mb-4" style="font-size: 0.9rem;">Everything you need to turn raw GeoJSON into a publishable STAC Item.</p>
 
     <div class="row g-4">
       <div class="col-md-4">
         <div class="feature-item">
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="feature-num">1</div>
-            <h5 class="mb-0">Upload your data</h5>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="feature-icon"><i class="bi bi-cpu"></i></div>
+            <h5 class="mb-0">Auto-Extraction</h5>
           </div>
-          <p>Drop in a GeoJSON file. The system reads CRS, bounding box, geometry types, attribute schemas, and feature counts automatically.</p>
+          <p>Automatically extracts CRS, bounding box, geometry type, feature count, and attribute schema from your GeoJSON files.</p>
         </div>
       </div>
       <div class="col-md-4">
         <div class="feature-item">
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="feature-num">2</div>
-            <h5 class="mb-0">Review suggestions</h5>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="feature-icon"><i class="bi bi-stars"></i></div>
+            <h5 class="mb-0">AI-Assisted Metadata</h5>
           </div>
-          <p>AI generates titles, descriptions, keywords, and license fields based on the STAC specification. Edit anything before you export.</p>
+          <p>RAG-powered suggestions for title, description, and keywords grounded in the STAC specification.</p>
         </div>
       </div>
       <div class="col-md-4">
         <div class="feature-item">
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="feature-num">3</div>
-            <h5 class="mb-0">Export STAC JSON</h5>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="feature-icon"><i class="bi bi-download"></i></div>
+            <h5 class="mb-0">STAC Export</h5>
           </div>
-          <p>Download a fully compliant STAC Item ready for ingestion into any STAC catalog or API. All required fields included.</p>
+          <p>Export valid STAC 1.0.0 Item JSON ready for publication to any geospatial data catalogue.</p>
         </div>
       </div>
     </div>
@@ -221,51 +233,59 @@
 <section class="pricing-section">
   <div class="container">
     <h2>Pricing</h2>
-    <p class="text-muted mb-4" style="font-size: 0.9rem;">No surprises. Pick the plan that fits your workload.</p>
+    <p class="text-muted mb-4" style="font-size: 0.9rem;">Start free. Upgrade when you need more.</p>
 
     <div class="row g-4">
       <div class="col-md-6">
-        <div class="pricing-card">
-          <h5>Free</h5>
-          <div class="price">$0 <span>/ month</span></div>
+        <div class="pricing-card free">
+          <h5>{{ free_plan.name|default:"Free" }}</h5>
+          <div class="price">Free</div>
           <ul>
-            <li><i class="bi bi-check2"></i>Up to 2 projects</li>
-            <li><i class="bi bi-check2"></i>5 uploads per month</li>
-            <li><i class="bi bi-check2"></i>10 AI calls per month</li>
+            <li><i class="bi bi-check2"></i>
+              {% if free_plan.max_projects is None %}Unlimited{% else %}{{ free_plan.max_projects }}{% endif %} projects
+            </li>
+            <li><i class="bi bi-check2"></i>
+              {% if free_plan.max_uploads_per_project is None %}Unlimited{% else %}{{ free_plan.max_uploads_per_project }}{% endif %} uploads per project
+            </li>
+            <li><i class="bi bi-check2"></i>
+              {% if free_plan.max_ai_calls_per_month is None %}Unlimited{% else %}{{ free_plan.max_ai_calls_per_month }}{% endif %} AI calls per month
+            </li>
             <li><i class="bi bi-check2"></i>STAC JSON export</li>
           </ul>
-          <a href="{% url 'register' %}" class="btn btn-outline-secondary w-100">Get started</a>
+          <a href="{% url 'register' %}" class="btn btn-outline-secondary w-100">Get Started Free</a>
         </div>
       </div>
       <div class="col-md-6">
-        <div class="pricing-card featured">
-          <h5>Pro</h5>
-          <div class="price">$29 <span>/ month</span></div>
+        <div class="pricing-card pro">
+          <span class="popular-badge">Most Popular</span>
+          <h5>{{ pro_plan.name|default:"Pro" }}</h5>
+          <div class="price">${{ pro_plan.price_aud|default:"29" }} <span>AUD / month</span></div>
           <ul>
-            <li><i class="bi bi-check2"></i>Unlimited projects</li>
-            <li><i class="bi bi-check2"></i>Unlimited uploads</li>
-            <li><i class="bi bi-check2"></i>200 AI calls per month</li>
-            <li><i class="bi bi-check2"></i>STAC JSON export</li>
+            <li><i class="bi bi-check2"></i>
+              {% if pro_plan.max_projects is None %}Unlimited{% else %}{{ pro_plan.max_projects }}{% endif %} projects
+            </li>
+            <li><i class="bi bi-check2"></i>
+              {% if pro_plan.max_uploads_per_project is None %}Unlimited{% else %}{{ pro_plan.max_uploads_per_project }}{% endif %} uploads per project
+            </li>
+            <li><i class="bi bi-check2"></i>
+              {% if pro_plan.max_ai_calls_per_month is None %}Unlimited{% else %}{{ pro_plan.max_ai_calls_per_month }}{% endif %} AI calls per month
+            </li>
             <li><i class="bi bi-check2"></i>Priority support</li>
           </ul>
-          <a href="{% url 'register' %}" class="btn btn-gma w-100">Start free trial</a>
+          <a href="{% url 'register' %}" class="btn btn-light w-100">Get Started</a>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="cta-section">
-  <div class="container">
-    <h2>Ready to streamline your metadata workflow?</h2>
-    <p>Start for free. No credit card required.</p>
-    <a href="{% url 'register' %}" class="btn btn-gma px-4">Create your account</a>
-  </div>
-</section>
-
 <footer>
-  <div class="container text-center text-muted" style="font-size: 0.85rem;">
-    &copy; 2026 GeoMetaAssist. All rights reserved.
+  <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 text-muted" style="font-size: 0.85rem;">
+    <div>&copy; 2026 GeoMetaAssist. All rights reserved.</div>
+    <div class="d-flex gap-3">
+      <a href="{% url 'login' %}">Login</a>
+      <a href="{% url 'register' %}">Register</a>
+    </div>
   </div>
 </footer>
 {% endblock %}
