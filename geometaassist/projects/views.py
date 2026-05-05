@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
@@ -45,6 +46,7 @@ def project_create(request):
             project = form.save(commit=False)
             project.user = request.user
             project.save()
+            messages.success(request, 'Project created successfully.')
             return redirect('project_detail', pk=project.pk)
     else:
         form = GeoDataProjectForm()
@@ -78,6 +80,7 @@ def project_edit(request, pk):
         form = GeoDataProjectForm(request.POST, instance=project)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Project updated successfully.')
             return redirect('project_detail', pk=project.pk)
     else:
         form = GeoDataProjectForm(instance=project)
@@ -96,6 +99,7 @@ def project_delete(request, pk):
     project.is_deleted = True
     project.deleted_at = timezone.now()
     project.save(update_fields=['is_deleted', 'deleted_at'])
+    messages.success(request, 'Project deleted.')
     return redirect('dashboard')
 
 
@@ -120,8 +124,13 @@ def upload_geojson(request, project_pk):
             )
             try:
                 extract_metadata(upload)
+                messages.success(request, 'File uploaded and extraction complete.')
             except Exception:
-                pass  # Error is recorded on the upload; user sees it on detail page.
+                messages.warning(
+                    request,
+                    'File uploaded but extraction failed. '
+                    'You can retry from the upload detail page.',
+                )
             return redirect('upload_detail', project_pk=project.pk, upload_pk=upload.pk)
     else:
         form = GeoJSONUploadForm()
@@ -199,4 +208,5 @@ def upload_delete(request, project_pk, upload_pk):
     upload.is_deleted = True
     upload.deleted_at = timezone.now()
     upload.save(update_fields=['is_deleted', 'deleted_at'])
+    messages.success(request, 'Upload deleted.')
     return redirect('project_detail', pk=project.pk)

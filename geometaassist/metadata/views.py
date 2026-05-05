@@ -45,7 +45,7 @@ def retry_extraction(request, project_pk, upload_pk):
         extract_metadata(upload)
         messages.success(request, 'Extraction completed successfully.')
     except Exception:
-        messages.error(request, 'Extraction failed again. See the error message below.')
+        messages.error(request, 'Extraction failed again. Check the error details below.')
 
     return redirect('upload_detail', project_pk=project.pk, upload_pk=upload.pk)
 
@@ -67,7 +67,7 @@ def metadata_editor(request, project_pk, upload_pk):
         form = MetadataRecordForm(request.POST, instance=record)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Draft saved.')
+            messages.success(request, 'Metadata saved successfully.')
             return redirect('metadata_editor', project_pk=project_pk, upload_pk=upload_pk)
     else:
         form = MetadataRecordForm(instance=record)
@@ -94,6 +94,7 @@ def export_stac(request, project_pk, upload_pk):
         'full_stac_json', 'export_count', 'last_exported_at', 'updated_at',
     ])
 
+    messages.success(request, 'STAC Item exported successfully.')
     return redirect('export_success', project_pk=project_pk, upload_pk=upload_pk)
 
 

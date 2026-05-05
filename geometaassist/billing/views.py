@@ -84,8 +84,7 @@ def staff_subscription_edit(request, pk):
                 sub.archived_at = None
                 sub.archived_by = None
             sub.save()
-            messages.success(
-                request, f'Subscription for {subscription.user.email} updated.')
+            messages.success(request, 'Subscription updated successfully.')
             return redirect('staff_subscriptions')
     else:
         form = StaffSubscriptionForm(instance=subscription)

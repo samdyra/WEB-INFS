@@ -31,6 +31,10 @@ def register_view(request):
             free_plan = SubscriptionPlan.objects.get(name='Free')
             UserSubscription.objects.create(user=user, plan=free_plan)
             login(request, user)
+            messages.success(
+                request,
+                f'Welcome to GeoMetaAssist, {user.first_name or user.email}!',
+            )
             return redirect('dashboard')
     else:
         form = RegisterForm()

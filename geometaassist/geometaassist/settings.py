@@ -5,6 +5,7 @@ Django settings for geometaassist project.
 import os
 from pathlib import Path
 
+from django.contrib.messages import constants as message_constants
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -113,6 +114,15 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+MESSAGE_TAGS = {
+    message_constants.DEBUG:   'secondary',
+    message_constants.INFO:    'info',
+    message_constants.SUCCESS: 'success',
+    message_constants.WARNING: 'warning',
+    message_constants.ERROR:   'danger',
+}
 
 
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
