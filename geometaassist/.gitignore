@@ -13,3 +13,4 @@ staticfiles/
 rag/chroma_store/
 .idea/
 .vscode/
+creds.txt

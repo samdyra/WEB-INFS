@@ -25,6 +25,10 @@ ALLOWED_HOSTS = [
     if h.strip()
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://infs3202-414ae30f.uqcloud.net'
+]
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -107,8 +111,9 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_URL = 'static/'
+STATIC_URL = '/geometaassist_static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = '/var/www/htdocs/geometaassist_static/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
