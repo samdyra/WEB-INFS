@@ -39,3 +39,5 @@ All views are defined in `mockup/views.py` and routes in `mockup/urls.py`.
 
 
 how to ingest: python manage.py ingest_stac_spec
+
+AI Usage

@@ -29,6 +29,28 @@ CSRF_TRUSTED_ORIGINS = [
     'https://infs3202-414ae30f.uqcloud.net'
 ]
 
+# Tells Django that the UQCloud load balancer handles SSL termination.
+# Requests arrive at Gunicorn as plain HTTP internally, but this header
+# tells Django to treat them as HTTPS so secure cookies and redirects work correctly.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Ensures session and CSRF cookies are only sent over HTTPS in production.
+# Set to False locally (when DEBUG=True) so plain HTTP dev server still works.
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
+# Prevents JavaScript from reading the session cookie, mitigating session
+# theft via XSS attacks.
+SESSION_COOKIE_HTTPONLY = True
+
+# Prevents the app from being embedded in an iframe on other sites,
+# mitigating clickjacking attacks.
+X_FRAME_OPTIONS = 'DENY'
+
+# Prevents browsers from guessing (sniffing) the content type of responses,
+# which can prevent certain XSS attacks via uploaded files.
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -111,7 +133,7 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_URL = '/geometaassist_static/'
+STATIC_URL = os.environ.get('DJANGO_STATIC_URL', '/geometaassist_static/')
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = '/var/www/htdocs/geometaassist_static/'
 
