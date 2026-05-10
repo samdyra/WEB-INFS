@@ -9,7 +9,7 @@ urlpatterns = [
         name='retry_extraction',
     ),
     path(
-        'metadata/<int:project_pk>/uploads/<int:upload_pk>/edit/',
+        'metadata/<int:project_pk>/uploads/<int:upload_pk>/metadata_editor/',
         views.metadata_editor,
         name='metadata_editor',
     ),
@@ -19,7 +19,7 @@ urlpatterns = [
         name='export_stac',
     ),
     path(
-        'metadata/<int:project_pk>/uploads/<int:upload_pk>/export/success/',
+        'metadata/<int:project_pk>/uploads/<int:upload_pk>/export_success/',
         views.export_success,
         name='export_success',
     ),

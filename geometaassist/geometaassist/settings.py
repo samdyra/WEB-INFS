@@ -64,7 +64,6 @@ INSTALLED_APPS = [
     'projects',
     'billing',
     'metadata',
-    'mockup',
 ]
 
 MIDDLEWARE = [
