@@ -151,8 +151,9 @@
         <form id="chat-form" class="input-group"
               data-url="{% url 'ai_chat' project.pk upload.pk %}">
           <input type="text" id="chat-input" class="form-control"
-                 placeholder="Ask about STAC metadata..." required autocomplete="off">
-          <button type="submit" class="btn btn-gma"><i class="bi bi-send"></i></button>
+                 placeholder="Ask about STAC metadata..." required autocomplete="off"
+                 aria-label="Ask the metadata assistant a question">
+          <button type="submit" class="btn btn-gma" aria-label="Send message"><i class="bi bi-send"></i></button>
         </form>
         <small class="text-muted d-block mt-2" style="font-size: 0.8rem;">
           Powered by RAG over the STAC specification.

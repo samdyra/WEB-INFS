@@ -1,116 +1,87 @@
 # AI Usage — GeoMetaAssist
 
-## Tools Used
-- **Claude (claude.ai)** — design document drafting, architecture planning, code review, deployment guidance
-- **Claude Code** — code generation, CSS and responsive layout implementation
-
----
-
-## Usage Log
+## Design Document
 
 ### 1. Project Overview & Key Features
-**Tool:** Claude (claude.ai)
-**Prompt goal:** Draft the project overview, problem domain, target audience, and key features for GeoMetaAssist.
-**What I learned:** How to frame a SaaS product description clearly, separating problem domain, audience, and feature scope.
+Tool: Claude (claude.ai)
+Prompt Goal: Refine the project overview, problem domain, and target audience. Claude also help me draft the list of key features for GeoMetaAssist.
+What I Learned: How to frame a SaaS product description clearly, separating problem domain, audience, and feature scope.
 
----
-
-### 2. Database Schema Design
-**Tool:** Claude (claude.ai)
-**Prompt goal:** Design a normalised database schema in DBML for a Django SaaS application supporting users, subscriptions, projects, GeoJSON uploads, metadata, and AI chat sessions.
-**What I learned:** DBML syntax, AbstractUser field inheritance in Django, BCNF design principles, surrogate key patterns, and how to model SaaS subscription tiers relationally.
-
----
+### 2. Database Design
+Tool: Claude (claude.ai)
+Prompt Goal: Help to critically assess the normalization, integrate with the Django user entity, rationale of the entity and relationships, and also making sure my design follow the STAC specification.
+What I Learned: DBML syntax, AbstractUser field inheritance in Django, BCNF design principles, and how to model SaaS subscription tiers relationally.
 
 ### 3. HTML Mockups
-**Tool:** Claude Code
-**Prompt goal:** Initialise a Django project and generate HTML mockup templates for all pages using Bootstrap 5 with a white and dark green colour scheme and sidebar navigation layout.
-**What I learned:** Django project and app structure, Bootstrap 5 grid and component usage. HTML structure was written manually; Claude Code was used to assist with CSS and responsive layout implementation.
-
----
+Tool: Claude Code
+Prompt Goal: Initialise a Django project and help me build HTML mockups templates for all pages using Bootstrap 5 with realistic placeholder content (mock data).
+What I Learned: Django project and app structure, Bootstrap 5 grid and component usage. Claude Code was used heavily to assist with CSS and responsive layout implementation.
 
 ### 4. Technology Research
-**Tool:** Claude (claude.ai)
-**Prompt goal:** Compare STAC 1.0.0 vs ISO 19115 and client-side (Turf.js) vs server-side (GeoPandas) GeoJSON metadata extraction and produce a justified decision for each.
-**What I learned:** The technical and architectural trade-offs between client-side and server-side extraction, and the differences between STAC and ISO 19115 in a web-native SaaS context.
+Tool: Claude (claude.ai)
+Prompt Goal: Client-side (Turf.js) vs server-side (GeoPandas) GeoJSON metadata extraction across relevant criteria and produce a justified decision for each.
+What I Learned: The technical and architectural trade-offs between client-side and server-side extraction.
+
+### 5. Accessibility
+Tool: Claude (claude.ai)
+Prompt Goal: Criticize the accessibility section, help me assess what 10 most relevant criteria for GeoMetaAssist, and help me map each to a specific UI component with relevant accessibility consideration.
+What I Learned: WCAG 2.1 structure, the POUR principles, and how specific criteria such as ARIA live regions, skip links, and colour contrast apply to a real application interface.
+
+### 6. Security
+Tool: Claude (claude.ai)
+Prompt Goal: Criticize my draft on security key points that I made mostly based on Django docs, and give ideas on what other security consideration other than what Django provides.
+What I Learned: Distinction between role-level and object-level permission, HSTS and its role in preventing SSL stripping attacks, and why returning a 404 instead of a 403 on unauthorised object access avoids confirming resource existence to an attacker.
+
+-------
+
+## Code Implementation
+
+### 1. Django Project Setup and Authentication
+Tool: Claude
+Prompt Goal: Help me init the real Django project with the User model using email as USERNAME_FIELD, then implement register, login, and logout views, and then setup the URL patterns.
+What I Learned: We can make a custom user model creation with AbstractUser, and the UserManager override for email-based authentication, I also learn about Django form validation patterns, and session-based authentication flow.
+
+### 2. Soft Deletion
+Tool: Claude
+Prompt Goal: Give example of how soft deletion is made, and how we can use it instead of hard deletion
+What I Learned: Soft delete pattern using is_deleted and deleted_at fields, (archive in subscription)
+
+### 3. User Profile and Settings Page as an Example of how to create a feature end to end
+Tool: Claude
+Prompt Goal: Help me build the settings page, to help me understand end to end on how to do simple CRUD, and making sure we discuss the best practice in Django
+What I Learned: Handling multiple forms on one page, update_session_auth_hash to keep users logged in after a password change, and some good practice in handling CRUD in Django, to help me equip the skills to make the rest of the features
+
+### 4. File upload handling
+Tool: Claude
+Prompt Goal: Help me Implement GeoJSON file upload with serverside validation (for security), UUID-based storage path, and upload status tracking.
+What I Learned: Django FileField and file upload handling, server-side file validation, and Django's MEDIA_ROOT and MEDIA_URL configuration.
+
+### 5. Subscription
+Tool: Claude
+Prompt Goal: Help me to structure, plan, and build the subscription plans model, and how to enforce the various quota logic
+What I Learned:quota enforcement at the view layer, custom decorators for RBAC, and Django's Pagination (for the UI).
+
+### 6. Technical Metadata Extraction
+Tool: Claude
+Prompt Goal: Help me implement GeoJSON Metadata extraction using geopandas
+What I Learned: GeoPandas API for reading GeoJSON files and extracting CRS, bounding box, geometry type, feature count, and attribute schema. Error handling patterns for extraction pipelines.
+
+### 7. STAC Metadata Editor and Export
+Tool: Claude
+Prompt Goal: Guide me build the metadata editor, especially the client side code (JS), how do we prefill fields based on the AI Suggestion, and how to export/download files
+What I Learned: STAC 1.0.0 Item structure including required fields (type, stac_version, id, geometry, bbox, properties, links, assets), datetime handling per spec, and serving file downloads, some 
+Client side handling using javascript, and how it wired with the HTML Elements.
+
+### 8. RAG and AI Chatbot
+Tool: Claude
+Prompt Goal: Help me plan to implement RAG pipeline using LangChain and ChromaDB over the STAC specs documents, with an AI suggestions button and a chatbot panel in the metadata editor
+What I Learned: How RAG works from end to end, from ingesting documents to vector store using text-embedding-3-small (provided api), retrieving relevant chunks on each query, and passing those chunks as part of prompot for the gpt-5.4-mini to generate better responses.
+
+### 9. Deployment to UQCloud Zone
+Tool: Claude
+Prompt Goal: some guidance and help me debug the deployment of the Django app to UQCloud Zone including setup Gunicorn, Nginx, static file collection, and production environment setup.
+What I Learned: Gunicorn configuration, Nginx reverse proxy setup for Django, and production security header configuration.
 
 ---
 
-### 5. Accessibility Section
-**Tool:** Claude (claude.ai)
-**Prompt goal:** Draft the WCAG 2.1 Level AA accessibility section, select the 10 most relevant criteria for GeoMetaAssist, and map each to a specific UI component with an implementation approach.
-**What I learned:** WCAG 2.1 structure, the POUR principles, and how specific criteria such as ARIA live regions, skip links, and colour contrast apply to a real application interface.
-
----
-
-### 6. Security Section
-**Tool:** Claude (claude.ai)
-**Prompt goal:** Draft the security section covering authentication, RBAC with three user roles, object-level permission enforcement, CSRF, XSS, SQL injection, file upload security, and production security headers.
-**What I learned:** Web application security concepts including brute-force protection strategies, the distinction between role-level and object-level permission enforcement, HSTS and SSL stripping prevention, and why returning 404 instead of 403 on unauthorised access avoids confirming resource existence.
-
----
-
-### 7. Django Project Setup and Authentication
-**Tool:** Claude Code
-**Prompt goal:** Initialise the real Django project with the custom User model using email as USERNAME_FIELD, implement register, login, and logout views, and wire up all URL patterns.
-**What I learned:** Custom user model creation with AbstractUser, UserManager override for email-based authentication, Django form validation patterns, and session-based authentication flow.
-
----
-
-### 8. Geo Data Projects CRUD
-**Tool:** Claude Code
-**Prompt goal:** Create the projects app with GeoDataProject model, implement full CRUD views with soft delete and object-level ownership enforcement.
-**What I learned:** Soft delete pattern using is_deleted and deleted_at fields, object-level ownership enforcement using get_object_or_404 with user filter, and why 404 is preferable to 403 for unauthorised object access.
-
----
-
-### 9. User Profile and Settings Page
-**Tool:** Claude Code
-**Prompt goal:** Build a settings page where users can update their name and change their password, with two separate forms on the same page.
-**What I learned:** Handling multiple forms on one page using a hidden action field, update_session_auth_hash to keep users logged in after a password change, and Django's built-in password validation.
-
----
-
-### 10. GeoJSON File Upload
-**Tool:** Claude Code
-**Prompt goal:** Implement GeoJSON file upload with server-side validation (extension, MIME type, size), UUID-based storage path, and upload status tracking.
-**What I learned:** Django FileField and file upload handling, server-side file validation, UUID-based filename generation to prevent path traversal, and Django's MEDIA_ROOT and MEDIA_URL configuration.
-
----
-
-### 11. Subscription Model and Staff Portal
-**Tool:** Claude Code
-**Prompt goal:** Build the subscription plans model, auto-assign Free plan on registration, implement quota enforcement, and create a custom staff portal for managing subscriptions.
-**What I learned:** Data migrations for seeding default records, quota enforcement at the view layer, custom decorators for role-based access control, and Django's Paginator class.
-
----
-
-### 12. Technical Metadata Extraction
-**Tool:** Claude Code
-**Prompt goal:** Implement automatic GeoJSON metadata extraction using GeoPandas, triggered synchronously after upload, saving results to ExtractedTechnicalMetadata.
-**What I learned:** GeoPandas API for reading GeoJSON files and extracting CRS, bounding box, geometry type, feature count, and attribute schema. Error handling patterns for extraction pipelines.
-
----
-
-### 13. STAC Metadata Editor and Export
-**Tool:** Claude Code
-**Prompt goal:** Build the metadata editor form with STAC field groups, assemble the full STAC 1.0.0 Item JSON from form data and extracted metadata, and implement export and download.
-**What I learned:** STAC 1.0.0 Item structure including required fields (type, stac_version, id, geometry, bbox, properties, links, assets), datetime handling per spec, and serving file downloads via HttpResponse with Content-Disposition header.
-
----
-
-### 14. RAG Pipeline and AI Chatbot
-**Tool:** Claude Code
-**Prompt goal:** Implement a RAG pipeline using LangChain and ChromaDB over the STAC specification markdown files, with an AI suggestions button and a chatbot panel in the metadata editor.
-**What I learned:** How RAG works: ingesting documents into a vector store using text-embedding-3-small, retrieving relevant chunks via semantic similarity search on each query, and passing those chunks as context to gpt-5.4-mini to generate grounded responses. The distinction between the embedding model (retrieval) and the chat model (generation).
-
----
-
-### 15. Deployment to UQCloud Zone
-**Tool:** Claude (claude.ai)
-**Prompt goal:** Guide step-by-step deployment of the Django app to UQCloud Zone including Gunicorn systemd service, Nginx reverse proxy configuration, static file collection, and production environment setup.
-**What I learned:** Gunicorn systemd service configuration, Nginx reverse proxy setup for Django, the role of SECURE_PROXY_SSL_HEADER on a load-balanced server, why SECURE_SSL_REDIRECT must not be set on UQCloud Zone, and production security header configuration.
-
----
-
-*Note: prompts listed above represent the main goal of each interaction. Each section involved multiple follow-up exchanges to refine, correct, and adjust the output before it was incorporated into the project.*
+Note: prompts listed above represent the main goal of each interaction. Each section involved multiple follow-up exchanges to refine, correct, and adjust the output before it was incorporated into the project.

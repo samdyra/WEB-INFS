@@ -19,6 +19,25 @@ body {
   color: var(--gma-text-muted) !important;
 }
 
+/* Skip link: hidden until focused via keyboard */
+.skip-link {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translateY(-200%);
+  background: var(--gma-green-dark);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  z-index: 2000;
+  text-decoration: none;
+  border-radius: 0 0 6px 0;
+  transition: transform 0.15s ease;
+}
+.skip-link:focus {
+  transform: translateY(0);
+  color: #fff;
+}
+
 /* Sidebar */
 .sidebar {
   width: var(--sidebar-width);
