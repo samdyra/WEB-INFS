@@ -82,6 +82,12 @@ Tool: Claude
 Prompt Goal: some guidance and help me debug the deployment of the Django app to UQCloud Zone including setup Gunicorn, Nginx, static file collection, and production environment setup.
 What I Learned: Gunicorn configuration, Nginx reverse proxy setup for Django, and production security header configuration.
 
+### 10. View, Model, and Template wiring
+Tool: Claude
+Prompt Goal: I mostly built the UIs based on the mockup design on the first design document submission. In this part, I uses AI to help
+me wire up the logics inside views, urls, models, etc to wire it up with the mockup design. 
+What I Learned: End to end on how everythings connect in Django, from the first model creation, migration, setting up the urls, forms, admin page, and how it connects with the templates that I have built earlier. 
+
 ---
 
 Note: prompts listed above represent the main goal of each interaction. Each section involved multiple follow-up exchanges to refine, correct, and adjust the output before it was incorporated into the project.
